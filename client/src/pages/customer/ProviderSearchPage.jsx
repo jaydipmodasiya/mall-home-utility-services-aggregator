@@ -1,4 +1,4 @@
-import { LocateFixed, MapPin, X } from 'lucide-react'
+import { Loader2, LocateFixed, MapPin, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PublicLayout } from '../../components/layout/Layout'
@@ -19,6 +19,7 @@ export default function ProviderSearchPage() {
   const [error, setError] = useState(false)
   const [coordinates, setCoordinates] = useState(null)
   const [locating, setLocating] = useState(false)
+  const [locationMessage, setLocationMessage] = useState('')
 
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
@@ -72,18 +73,29 @@ export default function ProviderSearchPage() {
   }
 
   const useCurrentLocation = () => {
+    setLocationMessage('')
     if (!navigator.geolocation) {
-      setError(true)
+      setLocationMessage('Location is not available in this browser. You can still search by city or area.')
       return
     }
     setLocating(true)
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        setCoordinates({ latitude: coords.latitude, longitude: coords.longitude })
+        const location = { latitude: coords.latitude, longitude: coords.longitude }
+        setCoordinates(location)
         setLocating(false)
-        fetchProviders(1, filters, { latitude: coords.latitude, longitude: coords.longitude })
+        setLocationMessage('Searching for providers near you...')
+        fetchProviders(1, filters, location)
       },
-      () => { setLocating(false); setError(true) },
+      (geoError) => {
+        setLocating(false)
+        const message = geoError.code === geoError.PERMISSION_DENIED
+          ? 'Location permission was denied. You can still search by city or area.'
+          : geoError.code === geoError.TIMEOUT
+            ? 'Location detection timed out. Please try again or search by city or area.'
+            : 'Your location could not be detected. You can still search by city or area.'
+        setLocationMessage(message)
+      },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     )
   }
@@ -111,14 +123,15 @@ export default function ProviderSearchPage() {
                   id="provider-location"
                   type="text"
                   placeholder="Search by city or area..."
-                  className="form-input h-11 pl-10"
+                  className="form-input h-11 pl-10 pr-12"
                   value={filters.city}
                   onChange={(e) => applyFilters({ ...filters, city: e.target.value })}
                 />
-                <button type="button" onClick={useCurrentLocation} disabled={locating} className="absolute right-2 top-[2.65rem] -translate-y-1/2 rounded-md p-1.5 text-brand-aqua-deep hover:bg-brand-aqua/10 disabled:opacity-50" aria-label="Use my current location" title="Use my current location">
-                  <LocateFixed className="h-4 w-4" />
+                <button type="button" onClick={useCurrentLocation} disabled={locating} className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-brand-aqua-deep hover:bg-brand-aqua/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua/40 disabled:opacity-50" aria-label={locating ? 'Detecting your location' : 'Use my current location'} title="Use my current location">
+                  {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
                 </button>
               </div>
+              {locationMessage && <p className="mt-1 text-xs text-text-muted" role="status">{locationMessage}</p>}
             </div>
 
             <DropdownSelect className="min-w-[170px]" value={filters.category} onChange={(value) => applyFilters({ ...filters, category: value })} options={[{ value: '', label: 'All Services' }, ...CATEGORIES.map(({ key, label }) => ({ value: key, label }))]} label="Service category" />
