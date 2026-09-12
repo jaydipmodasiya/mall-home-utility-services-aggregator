@@ -42,17 +42,24 @@ function NotFound() {
   return (
     <PublicLayout navVariant="light">
       <div className="relative isolate overflow-hidden bg-cream-section">
+        <div className="pointer-events-none absolute inset-0 opacity-30" aria-hidden="true">
+          <div className="absolute left-[8%] top-16 h-24 w-24 rounded-2xl border border-brand-aqua-dark/30 rotate-12" />
+          <div className="absolute right-[10%] bottom-20 h-32 w-32 rounded-full border border-brand-coral/30" />
+          <div className="absolute left-1/2 top-1/4 h-px w-2/3 -translate-x-1/2 bg-brand-aqua-dark/30" />
+        </div>
         <div className="page-container flex min-h-[calc(100vh-16rem)] items-center justify-center py-16">
-          <div className="w-full max-w-2xl text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-aqua/30 text-brand-navy shadow-card">
+          <div className="relative w-full max-w-2xl text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-aqua/30 text-brand-navy shadow-card ring-8 ring-white/40">
               <Search className="h-9 w-9" aria-hidden="true" />
             </div>
             <p className="mb-3 text-7xl font-display font-extrabold leading-none text-brand-navy md:text-9xl" aria-hidden="true">404</p>
-            <h1 className="text-3xl font-display font-bold text-text-primary md:text-4xl">Page not found</h1>
-            <p className="mx-auto mt-3 max-w-md text-text-muted">This page may have moved, or the address may be incorrect.</p>
+            <p className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-brand-aqua-deep">route_status: missing</p>
+            <h1 className="text-3xl font-display font-bold text-text-primary md:text-4xl">Looks like this page took a wrong turn.</h1>
+            <p className="mx-auto mt-4 max-w-lg font-mono text-xs text-brand-navy/70">Nothing is broken in the matrix — this route just doesn't exist.</p>
+            <p className="mx-auto mt-3 max-w-md text-text-muted">Check the address or use one of the links below to find your way back to trusted local services.</p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link to="/" className="btn-navy"><Home className="h-4 w-4" aria-hidden="true" /> Go home</Link>
-              <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse services</Link>
+              <Link to="/" className="btn-navy"><Home className="h-4 w-4" aria-hidden="true" /> Back to Home</Link>
+              <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse Services</Link>
             </div>
           </div>
         </div>
