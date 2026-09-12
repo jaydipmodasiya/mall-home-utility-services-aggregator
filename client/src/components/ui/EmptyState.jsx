@@ -1,4 +1,4 @@
-import { AlertCircle, RefreshCw, SearchX, PackageOpen } from 'lucide-react'
+import { AlertCircle, PackageOpen, RefreshCw, SearchX } from 'lucide-react'
 
 export function ErrorState({ message = 'Something went wrong', onRetry }) {
   return (
@@ -30,16 +30,15 @@ export function EmptyState({ title = 'Nothing here yet', message, icon: Icon = P
   )
 }
 
-export function NoResults({ query }) {
+export function NoResults({ query, action }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
       <div className="w-14 h-14 rounded-xl bg-surface-tertiary flex items-center justify-center mb-4">
         <SearchX className="w-7 h-7 text-brand-aqua-dark" />
       </div>
       <h3 className="font-semibold text-text-primary mb-1">No results found</h3>
-      <p className="text-text-muted text-sm max-w-xs">
-        {query ? `No providers found for "${query}".` : 'No providers match your filters.'} Try adjusting your search.
-      </p>
+      <p className="text-text-muted text-sm max-w-xs">No providers found nearby. {query ? `Nothing matched "${query}".` : 'Try changing your category or location.'}</p>
+      {action && <div className="mt-5">{action}</div>}
     </div>
   )
 }

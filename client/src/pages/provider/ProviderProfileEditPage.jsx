@@ -2,6 +2,7 @@ import { AlertCircle, CheckCircle, DollarSign, FileText, MapPin, Save, Upload, U
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
+import { DropdownSelect } from '../../components/ui/DropdownSelect'
 import { SectionLoader, Spinner } from '../../components/ui/Spinner'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
@@ -186,11 +187,7 @@ export default function ProviderProfileEditPage() {
           <p className="text-sm text-text-muted mb-4">Upload your Aadhaar, PAN, or skill certificates for admin verification. Max 5MB. PDF, JPG or PNG.</p>
 
           <div className="flex gap-3 mb-4">
-            <select className="form-select flex-1" value={docType} onChange={(e) => setDocType(e.target.value)}>
-              <option value="identity">Identity Document (Aadhaar/PAN)</option>
-              <option value="skill_certificate">Skill Certificate</option>
-              <option value="other">Other</option>
-            </select>
+            <DropdownSelect className="flex-1" value={docType} onChange={setDocType} label="Document type" options={[{ value: 'identity', label: 'Identity Document (Aadhaar/PAN)' }, { value: 'skill_certificate', label: 'Skill Certificate' }, { value: 'other', label: 'Other' }]} />
             <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn-primary">
               {uploading ? <Spinner size="sm" /> : <><Upload className="w-4 h-4" /> Upload</>}
             </button>

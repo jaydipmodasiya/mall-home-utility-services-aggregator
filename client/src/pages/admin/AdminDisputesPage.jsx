@@ -2,6 +2,7 @@ import { AlertTriangle, CheckCircle, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
+import { DropdownSelect } from '../../components/ui/DropdownSelect'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { SectionLoader, Spinner } from '../../components/ui/Spinner'
 import api from '../../services/api'
@@ -122,11 +123,7 @@ export default function AdminDisputesPage() {
             <div className="space-y-3 mb-4">
               <div>
                 <label className="form-label">Action</label>
-                <select className="form-select" value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
-                  <option value="under_review">Mark Under Review</option>
-                  <option value="resolved">Mark Resolved</option>
-                  <option value="closed">Close</option>
-                </select>
+                <DropdownSelect value={newStatus} onChange={setNewStatus} label="Action" options={[{ value: 'under_review', label: 'Mark Under Review' }, { value: 'resolved', label: 'Mark Resolved' }, { value: 'closed', label: 'Close' }]} />
               </div>
               <div>
                 <label className="form-label">Resolution *</label>

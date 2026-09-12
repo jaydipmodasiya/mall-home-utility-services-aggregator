@@ -14,6 +14,7 @@ import {
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PublicLayout } from '../components/layout/Layout'
+import { DropdownSelect } from '../components/ui/DropdownSelect'
 
 /* ─────────────────────────────────────────────
    Data
@@ -214,18 +215,14 @@ export default function LandingPage() {
                   <label className="sr-only" htmlFor="hero-service">Service</label>
                   <div className="flex items-center gap-2.5 flex-1 px-4 py-3.5 border-b sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
                     <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#ABDDDE' }} />
-                    <select
-                      id="hero-service"
-                      className="dropdown-select min-h-0 flex-1 border-0 px-0 py-0 outline-none focus:ring-0"
-                      style={{ background: 'transparent', color: category ? '#0F2B3D' : '#9CA3AF' }}
+                    <DropdownSelect
+                      className="min-w-0 flex-1"
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                    >
-                      <option value="" disabled>Select a service</option>
-                      {services.map((s) => (
-                        <option key={s.key} value={s.key} className="text-gray-900">{s.label}</option>
-                      ))}
-                    </select>
+                      onChange={setCategory}
+                      placeholder="Select a service"
+                      label="Service"
+                      options={services.map((s) => ({ value: s.key, label: s.label }))}
+                    />
                   </div>
                   {/* Button */}
                   <button

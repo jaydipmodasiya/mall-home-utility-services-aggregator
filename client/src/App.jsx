@@ -1,4 +1,5 @@
-import { ArrowLeft, Home, Search } from 'lucide-react'
+import { ArrowLeft, Check, Home, RotateCcw, Terminal } from 'lucide-react'
+import { useState } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import { PublicLayout } from './components/layout/Layout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
@@ -39,25 +40,44 @@ import AdminProvidersPage from './pages/admin/AdminProvidersPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function NotFound() {
+  const [fixed, setFixed] = useState(false)
+  const [selectedNode, setSelectedNode] = useState(null)
+  const nodes = ['client', 'router', 'api', 'missing']
+
+  const resetRoute = () => {
+    setFixed(false)
+    setSelectedNode(null)
+  }
+
   return (
     <PublicLayout navVariant="light">
-      <div className="relative isolate overflow-hidden bg-cream-section">
-        <div className="pointer-events-none absolute inset-0 opacity-30" aria-hidden="true">
-          <div className="absolute left-[8%] top-16 h-24 w-24 rounded-2xl border border-brand-aqua-dark/30 rotate-12" />
-          <div className="absolute right-[10%] bottom-20 h-32 w-32 rounded-full border border-brand-coral/30" />
-          <div className="absolute left-1/2 top-1/4 h-px w-2/3 -translate-x-1/2 bg-brand-aqua-dark/30" />
-        </div>
-        <div className="page-container flex min-h-[calc(100vh-16rem)] items-center justify-center py-16">
-          <div className="relative w-full max-w-2xl text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-aqua/30 text-brand-navy shadow-card ring-8 ring-white/40">
-              <Search className="h-9 w-9" aria-hidden="true" />
+      <div className="route-error-shell">
+        <div className="page-container flex min-h-[calc(100vh-16rem)] items-center justify-center py-12 md:py-16">
+          <div className="route-error-panel w-full max-w-4xl">
+            <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+              <div>
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-aqua/50 bg-white/70 px-3 py-1.5 font-mono text-xs text-brand-navy"><Terminal className="h-3.5 w-3.5" /> route_status: 404</div>
+                <p className="text-7xl font-display font-extrabold leading-none text-brand-navy md:text-8xl" aria-hidden="true">404</p>
+                <h1 className="mt-4 text-3xl font-display font-bold text-text-primary md:text-4xl">Looks like this route took a wrong turn.</h1>
+                <p className="mt-4 font-mono text-xs text-brand-navy/70">Nothing is broken in the matrix - this route just doesn't exist.</p>
+                <p className="mt-3 max-w-md text-sm text-text-muted">Try the quick route repair, or use one of the links below to get back to trusted local services.</p>
+              </div>
+              <div className="route-debugger" aria-label="Optional route repair mini-game">
+                <div className="mb-4 flex items-center justify-between font-mono text-xs text-text-muted"><span>fix_route.sh</span><button type="button" onClick={resetRoute} className="btn-ghost p-1.5" aria-label="Reset route repair"><RotateCcw className="h-3.5 w-3.5" /></button></div>
+                <div className="route-map" role="group" aria-label="Choose the broken route node">
+                  {nodes.map((node, index) => (
+                    <div key={node} className="flex min-w-0 flex-1 items-center">
+                      <button type="button" className={`route-node ${selectedNode === node ? 'route-node-selected' : ''} ${fixed ? 'route-node-fixed' : ''}`} onClick={() => { setSelectedNode(node); if (node === 'missing') setFixed(true) }} aria-label={`Inspect ${node} route node`}>
+                        {fixed || selectedNode === node ? <Check className="h-4 w-4" /> : <span>{index + 1}</span>}
+                      </button>
+                      {index < nodes.length - 1 && <span className={`route-line ${fixed ? 'route-line-fixed' : ''}`} aria-hidden="true" />}
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 min-h-5 font-mono text-xs text-brand-navy/70">{fixed ? 'Route fixed. Nice debugging.' : selectedNode ? `${selectedNode} checked - inspect the broken node.` : 'Optional: click the node with the broken link.'}</p>
+              </div>
             </div>
-            <p className="mb-3 text-7xl font-display font-extrabold leading-none text-brand-navy md:text-9xl" aria-hidden="true">404</p>
-            <p className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-brand-aqua-deep">route_status: missing</p>
-            <h1 className="text-3xl font-display font-bold text-text-primary md:text-4xl">Looks like this page took a wrong turn.</h1>
-            <p className="mx-auto mt-4 max-w-lg font-mono text-xs text-brand-navy/70">Nothing is broken in the matrix — this route just doesn't exist.</p>
-            <p className="mx-auto mt-3 max-w-md text-text-muted">Check the address or use one of the links below to find your way back to trusted local services.</p>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col justify-end gap-3 sm:flex-row">
               <Link to="/" className="btn-navy"><Home className="h-4 w-4" aria-hidden="true" /> Back to Home</Link>
               <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse Services</Link>
             </div>

@@ -1,11 +1,12 @@
+import { MapPin, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PublicLayout } from '../../components/layout/Layout'
-import { SectionLoader } from '../../components/ui/Spinner'
-import { NoResults } from '../../components/ui/EmptyState'
+import { DropdownSelect } from '../../components/ui/DropdownSelect'
+import { ErrorState, NoResults } from '../../components/ui/EmptyState'
 import ProviderCard from '../../components/ui/ProviderCard'
+import { ProviderListSkeleton } from '../../components/ui/Skeleton'
 import api from '../../services/api'
-import { Search, MapPin, ChevronDown, X, SlidersHorizontal } from 'lucide-react'
 import { CATEGORIES } from '../../utils/constants'
 
 export default function ProviderSearchPage() {
@@ -15,6 +16,7 @@ export default function ProviderSearchPage() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [pages, setPages] = useState(1)
+  const [error, setError] = useState(false)
 
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
@@ -25,6 +27,7 @@ export default function ProviderSearchPage() {
 
   const fetchProviders = async (p = 1, f = filters) => {
     setLoading(true)
+    setError(false)
     try {
       const params = new URLSearchParams({ page: p, limit: 12 })
       if (f.category)  params.set('category', f.category)
@@ -36,7 +39,7 @@ export default function ProviderSearchPage() {
       setTotal(data.total || 0)
       setPages(data.pages || 1)
       setPage(p)
-    } catch { setProviders([]) }
+    } catch { setProviders([]); setError(true) }
     finally { setLoading(false) }
   }
 
@@ -78,36 +81,9 @@ export default function ProviderSearchPage() {
               />
             </div>
 
-            <div className="relative min-w-[170px]">
-              <select
-                className="form-select"
-                value={filters.category}
-                onChange={(e) => applyFilters({ ...filters, category: e.target.value })}
-              >
-                <option value="">All Services</option>
-                {CATEGORIES.map(({ key, label }) => (
-                  <option key={key} value={key}>{label}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light pointer-events-none" />
-            </div>
-
-            <div className="relative min-w-[150px]">
-              <select className="form-select" value={filters.available} onChange={(e) => applyFilters({ ...filters, available: e.target.value })}>
-                <option value="">Any Availability</option>
-                <option value="true">Available Now</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light pointer-events-none" />
-            </div>
-
-            <div className="relative min-w-[140px]">
-              <select className="form-select" value={filters.minRating} onChange={(e) => applyFilters({ ...filters, minRating: e.target.value })}>
-                <option value="">Any Rating</option>
-                <option value="4">4+ Stars</option>
-                <option value="4.5">4.5+ Stars</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light pointer-events-none" />
-            </div>
+            <DropdownSelect className="min-w-[170px]" value={filters.category} onChange={(value) => applyFilters({ ...filters, category: value })} options={[{ value: '', label: 'All Services' }, ...CATEGORIES.map(({ key, label }) => ({ value: key, label }))]} label="Service category" />
+            <DropdownSelect className="min-w-[150px]" value={filters.available} onChange={(value) => applyFilters({ ...filters, available: value })} options={[{ value: '', label: 'Any Availability' }, { value: 'true', label: 'Available Now' }]} label="Availability" />
+            <DropdownSelect className="min-w-[140px]" value={filters.minRating} onChange={(value) => applyFilters({ ...filters, minRating: value })} options={[{ value: '', label: 'Any Rating' }, { value: '4', label: '4+ Stars' }, { value: '4.5', label: '4.5+ Stars' }]} label="Minimum rating" />
           </div>
 
           {/* Active chips */}
@@ -133,9 +109,11 @@ export default function ProviderSearchPage() {
 
         {/* Results */}
         {loading ? (
-          <SectionLoader />
+          <ProviderListSkeleton />
+        ) : error ? (
+          <ErrorState message="We couldn't load providers right now. Please try again." onRetry={() => fetchProviders(1)} />
         ) : providers.length === 0 ? (
-          <NoResults query={filters.city} />
+          <NoResults query={filters.city} action={<button type="button" className="btn-secondary text-sm" onClick={() => applyFilters({ category: '', city: '', available: '', minRating: '' })}>Clear Filters</button>} />
         ) : (
           <>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">

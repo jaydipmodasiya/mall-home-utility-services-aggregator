@@ -1,8 +1,9 @@
-import { ChevronDown, Search, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { Search, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { Avatar } from '../../components/ui/Avatar'
+import { DropdownSelect } from '../../components/ui/DropdownSelect'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import api from '../../services/api'
@@ -64,15 +65,7 @@ export default function AdminUsersPage() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light" />
           <input type="text" className="form-input pl-10" placeholder="Search by name or email..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchUsers(search, roleFilter)} />
         </div>
-        <div className="relative">
-          <select className="form-select pr-9 min-w-[160px]" value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value); fetchUsers(search, e.target.value) }}>
-            <option value="">All Roles</option>
-            <option value="customer">Customers</option>
-            <option value="provider">Providers</option>
-            <option value="admin">Admins</option>
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light pointer-events-none" />
-        </div>
+        <DropdownSelect className="min-w-[160px]" value={roleFilter} onChange={(value) => { setRoleFilter(value); fetchUsers(search, value) }} label="Role" options={[{ value: '', label: 'All Roles' }, { value: 'customer', label: 'Customers' }, { value: 'provider', label: 'Providers' }, { value: 'admin', label: 'Admins' }]} />
         <button onClick={() => fetchUsers(search, roleFilter)} className="btn-secondary">Search</button>
       </div>
 

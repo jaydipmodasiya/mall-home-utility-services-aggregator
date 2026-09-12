@@ -144,6 +144,62 @@
     @apply bg-white text-text-primary;
   }
 
+  .dropdown-trigger {
+    @apply flex min-h-[44px] w-full items-center justify-between gap-3 rounded-lg border border-brand-peach-warm
+           bg-white px-4 py-2.5 text-left text-sm text-text-primary shadow-sm transition-all
+           hover:border-brand-aqua-dark focus:outline-none focus-visible:border-brand-aqua-dark
+           focus-visible:ring-2 focus-visible:ring-brand-aqua/30 disabled:cursor-not-allowed
+           disabled:opacity-60;
+  }
+
+  .dropdown-menu {
+    @apply absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 max-h-64 overflow-y-auto rounded-lg
+           border border-brand-peach-warm bg-white p-1.5 shadow-modal;
+  }
+
+  .dropdown-option {
+    @apply flex min-h-[40px] w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm
+           text-text-secondary transition-colors hover:bg-brand-aqua/15 hover:text-text-primary
+           focus:outline-none focus-visible:bg-brand-aqua/20 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .dropdown-option-highlighted { @apply bg-brand-aqua/10 text-text-primary; }
+  .dropdown-option-selected { @apply font-semibold text-brand-navy; }
+
+  .route-error-shell {
+    @apply relative isolate overflow-hidden bg-cream-section;
+  }
+
+  .route-error-shell::before {
+    content: '';
+    @apply pointer-events-none absolute inset-0 opacity-40;
+    background-image: linear-gradient(rgba(171,221,222,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(171,221,222,0.25) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .route-error-panel { @apply relative rounded-2xl border border-white/80 bg-white/70 p-5 shadow-card backdrop-blur-sm md:p-10; }
+  .route-debugger { @apply rounded-xl border border-brand-aqua/40 bg-brand-navy p-5 shadow-card; }
+  .route-map { @apply flex items-center; }
+  .route-node { @apply flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-brand-aqua bg-brand-navy text-xs font-bold text-brand-aqua transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy; }
+  .route-node-selected { @apply border-brand-coral bg-brand-coral text-white; }
+  .route-node-fixed { @apply border-brand-mint bg-brand-mint text-brand-navy; }
+  .route-line { @apply h-0.5 flex-1 bg-brand-aqua/35 transition-colors; }
+  .route-line-fixed { @apply bg-brand-mint; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .route-line-fixed { animation: route-connect 500ms ease-out; }
+    .route-node-fixed { animation: route-pop 350ms ease-out; }
+  }
+
+  @keyframes route-connect {
+    from { opacity: 0.35; transform: scaleX(0.4); transform-origin: left; }
+    to { opacity: 1; transform: scaleX(1); transform-origin: left; }
+  }
+
+  @keyframes route-pop {
+    50% { transform: scale(1.15); }
+  }
+
   .form-textarea {
     @apply form-input resize-none min-h-[100px];
   }
