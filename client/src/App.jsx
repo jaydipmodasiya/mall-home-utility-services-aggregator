@@ -1,8 +1,8 @@
-import { ArrowLeft, Check, Home, RotateCcw, Terminal } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowLeft, Home } from 'lucide-react'
 import { Link, Route, Routes } from 'react-router-dom'
 import { PublicLayout } from './components/layout/Layout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
+import DeveloperPlayground from './components/ui/DeveloperPlayground'
 import { PageLoader } from './components/ui/Spinner'
 import { useAuth } from './context/AuthContext'
 
@@ -40,46 +40,23 @@ import AdminProvidersPage from './pages/admin/AdminProvidersPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function NotFound() {
-  const [fixed, setFixed] = useState(false)
-  const [selectedNode, setSelectedNode] = useState(null)
-  const nodes = ['client', 'router', 'api', 'missing']
-
-  const resetRoute = () => {
-    setFixed(false)
-    setSelectedNode(null)
-  }
-
   return (
     <PublicLayout navVariant="light">
       <div className="route-error-shell">
-        <div className="page-container flex min-h-[calc(100vh-16rem)] items-center justify-center py-12 md:py-16">
-          <div className="route-error-panel w-full max-w-4xl">
-            <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
-              <div>
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-aqua/50 bg-white/70 px-3 py-1.5 font-mono text-xs text-brand-navy"><Terminal className="h-3.5 w-3.5" /> route_status: 404</div>
-                <p className="text-7xl font-display font-extrabold leading-none text-brand-navy md:text-8xl" aria-hidden="true">404</p>
-                <h1 className="mt-4 text-3xl font-display font-bold text-text-primary md:text-4xl">Looks like this route took a wrong turn.</h1>
-                <p className="mt-4 font-mono text-xs text-brand-navy/70">Nothing is broken in the matrix - this route just doesn't exist.</p>
-                <p className="mt-3 max-w-md text-sm text-text-muted">Try the quick route repair, or use one of the links below to get back to trusted local services.</p>
-              </div>
-              <div className="route-debugger" aria-label="Optional route repair mini-game">
-                <div className="mb-4 flex items-center justify-between font-mono text-xs text-text-muted"><span>fix_route.sh</span><button type="button" onClick={resetRoute} className="btn-ghost p-1.5" aria-label="Reset route repair"><RotateCcw className="h-3.5 w-3.5" /></button></div>
-                <div className="route-map" role="group" aria-label="Choose the broken route node">
-                  {nodes.map((node, index) => (
-                    <div key={node} className="flex min-w-0 flex-1 items-center">
-                      <button type="button" className={`route-node ${selectedNode === node ? 'route-node-selected' : ''} ${fixed ? 'route-node-fixed' : ''}`} onClick={() => { setSelectedNode(node); if (node === 'missing') setFixed(true) }} aria-label={`Inspect ${node} route node`}>
-                        {fixed || selectedNode === node ? <Check className="h-4 w-4" /> : <span>{index + 1}</span>}
-                      </button>
-                      {index < nodes.length - 1 && <span className={`route-line ${fixed ? 'route-line-fixed' : ''}`} aria-hidden="true" />}
-                    </div>
-                  ))}
+        <div className="page-container flex min-h-[calc(100vh-16rem)] items-center justify-center py-10 md:py-14">
+          <div className="route-error-panel w-full max-w-5xl">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center">
+              <div className="min-w-0">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-brand-aqua-deep">route_status: 404</p>
+                <p className="mt-3 text-7xl font-display font-extrabold leading-none text-brand-navy sm:text-8xl" aria-hidden="true">404</p>
+                <h1 className="mt-4 text-3xl font-display font-bold leading-tight text-text-primary sm:text-4xl">Looks like this route took a wrong turn.</h1>
+                <p className="mt-4 max-w-md text-sm leading-6 text-text-muted">This page doesn't exist, but we can still get you back on track.</p>
+                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                  <Link to="/" className="btn-navy"><Home className="h-4 w-4" aria-hidden="true" /> Back to Home</Link>
+                  <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse Services</Link>
                 </div>
-                <p className="mt-4 min-h-5 font-mono text-xs text-brand-navy/70">{fixed ? 'Route fixed. Nice debugging.' : selectedNode ? `${selectedNode} checked - inspect the broken node.` : 'Optional: click the node with the broken link.'}</p>
               </div>
-            </div>
-            <div className="mt-8 flex flex-col justify-end gap-3 sm:flex-row">
-              <Link to="/" className="btn-navy"><Home className="h-4 w-4" aria-hidden="true" /> Back to Home</Link>
-              <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse Services</Link>
+              <DeveloperPlayground />
             </div>
           </div>
         </div>

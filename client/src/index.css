@@ -177,18 +177,39 @@
     background-size: 32px 32px;
   }
 
-  .route-error-panel { @apply relative rounded-2xl border border-white/80 bg-white/70 p-5 shadow-card backdrop-blur-sm md:p-10; }
-  .route-debugger { @apply rounded-xl border border-brand-aqua/40 bg-brand-navy p-5 shadow-card; }
-  .route-map { @apply flex items-center; }
-  .route-node { @apply flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-brand-aqua bg-brand-navy text-xs font-bold text-brand-aqua transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy; }
-  .route-node-selected { @apply border-brand-coral bg-brand-coral text-white; }
-  .route-node-fixed { @apply border-brand-mint bg-brand-mint text-brand-navy; }
-  .route-line { @apply h-0.5 flex-1 bg-brand-aqua/35 transition-colors; }
-  .route-line-fixed { @apply bg-brand-mint; }
+  .route-error-panel { @apply relative rounded-2xl border border-white/80 bg-white/70 p-5 shadow-card backdrop-blur-sm sm:p-8 md:p-10; }
+  .developer-playground { @apply min-w-0 rounded-2xl border border-brand-aqua/40 bg-brand-navy p-4 shadow-card sm:p-5; }
+  .playground-tabs { @apply grid grid-cols-2 gap-1.5 rounded-lg bg-white/5 p-1 sm:grid-cols-4; }
+  .playground-tab { @apply min-w-0 rounded-md px-2 py-2 text-xs font-semibold leading-tight text-text-onDark/65 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .playground-tab-active { @apply bg-brand-aqua text-brand-navy; }
+  .developer-game-panel { @apply min-w-0 rounded-xl border border-white/10 bg-brand-navy-light/60 p-4; }
+  .playground-reset { @apply rounded-md p-1.5 text-brand-aqua/70 transition-colors hover:bg-white/10 hover:text-brand-aqua focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .playground-route { @apply flex min-w-0 items-center; }
+  .playground-route-step { @apply flex min-w-0 flex-1 items-center; }
+  .playground-node { @apply flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-brand-aqua bg-brand-navy text-xs font-bold text-brand-aqua transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy; }
+  .playground-node-selected { @apply border-brand-coral bg-brand-coral text-white; }
+  .playground-node-fixed { @apply border-brand-mint bg-brand-mint text-brand-navy; }
+  .playground-link { @apply h-0.5 min-w-2 flex-1 bg-brand-aqua/35 transition-colors; }
+  .playground-link-fixed { @apply bg-brand-mint; }
+  .playground-hint { @apply mt-4 min-h-10 text-xs leading-5 text-brand-aqua/75; }
+  .playground-snippets { @apply grid gap-2 sm:grid-cols-3; }
+  .playground-snippet { @apply flex min-w-0 items-start gap-2 rounded-lg border border-white/10 bg-black/15 p-3 text-left font-mono text-[11px] leading-5 text-white/80 transition-colors hover:border-brand-aqua/60 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .playground-snippet code { @apply min-w-0 break-words; }
+  .playground-snippet-picked { @apply border-brand-mint bg-brand-mint/15; }
+  .playground-node-grid { @apply grid grid-cols-4 gap-3 sm:gap-5; }
+  .playground-connect-node { @apply mx-auto flex h-11 w-11 items-center justify-center rounded-full border border-brand-aqua/60 bg-white/5 text-sm font-bold text-brand-aqua transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .playground-signal { @apply flex flex-wrap items-center gap-3 rounded-lg border border-white/10 bg-black/15 p-4; }
+  .playground-signal-line { @apply h-0.5 min-w-8 flex-1 bg-brand-coral/70; }
+  .playground-signal-live { @apply bg-brand-mint; }
+  .playground-signal-button { @apply h-7 w-7 rounded-full border-2 border-transparent transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .signal-amber { @apply bg-brand-peach; }
+  .signal-green { @apply bg-brand-mint; }
+  .signal-coral { @apply bg-brand-coral; }
+  .playground-signal-selected { @apply border-white; }
 
   @media (prefers-reduced-motion: no-preference) {
-    .route-line-fixed { animation: route-connect 500ms ease-out; }
-    .route-node-fixed { animation: route-pop 350ms ease-out; }
+    .playground-link-fixed { animation: route-connect 500ms ease-out; }
+    .playground-node-fixed { animation: route-pop 350ms ease-out; }
   }
 
   @keyframes route-connect {
