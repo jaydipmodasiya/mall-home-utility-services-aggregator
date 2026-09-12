@@ -72,15 +72,17 @@ export default function ProviderSearchPage() {
             {/* City search */}
             <div className="relative min-w-0">
               <label className="form-label" htmlFor="provider-location">City or area</label>
-              <MapPin className="absolute left-3.5 top-[2.65rem] w-4 h-4 -translate-y-1/2 text-text-light" />
-              <input
-                id="provider-location"
-                type="text"
-                placeholder="Search by city or area..."
-                className="form-input h-11 pl-10"
-                value={filters.city}
-                onChange={(e) => applyFilters({ ...filters, city: e.target.value })}
-              />
+              <div className="relative">
+                <MapPin className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-light" />
+                <input
+                  id="provider-location"
+                  type="text"
+                  placeholder="Search by city or area..."
+                  className="form-input h-11 pl-10"
+                  value={filters.city}
+                  onChange={(e) => applyFilters({ ...filters, city: e.target.value })}
+                />
+              </div>
             </div>
 
             <DropdownSelect className="min-w-[170px]" value={filters.category} onChange={(value) => applyFilters({ ...filters, category: value })} options={[{ value: '', label: 'All Services' }, ...CATEGORIES.map(({ key, label }) => ({ value: key, label }))]} label="Service category" />
