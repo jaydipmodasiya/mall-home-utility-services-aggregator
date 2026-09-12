@@ -1,7 +1,9 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import { PageLoader } from './components/ui/Spinner'
+import { ArrowLeft, Home, Search } from 'lucide-react'
+import { Link, Route, Routes } from 'react-router-dom'
+import { PublicLayout } from './components/layout/Layout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
+import { PageLoader } from './components/ui/Spinner'
+import { useAuth } from './context/AuthContext'
 
 // Public pages
 import LandingPage from './pages/LandingPage'
@@ -10,42 +12,52 @@ import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 
 // Customer pages
-import CustomerDashboard from './pages/customer/CustomerDashboard'
-import ProviderSearchPage from './pages/customer/ProviderSearchPage'
-import ProviderProfilePage from './pages/customer/ProviderProfilePage'
+import BookingDetailPage from './pages/customer/BookingDetailPage'
 import BookingFlowPage from './pages/customer/BookingFlowPage'
 import BookingsListPage from './pages/customer/BookingsListPage'
-import BookingDetailPage from './pages/customer/BookingDetailPage'
-import ServiceHistoryPage from './pages/customer/ServiceHistoryPage'
+import CustomerDashboard from './pages/customer/CustomerDashboard'
 import CustomerProfilePage from './pages/customer/CustomerProfilePage'
+import ProviderProfilePage from './pages/customer/ProviderProfilePage'
+import ProviderSearchPage from './pages/customer/ProviderSearchPage'
+import ServiceHistoryPage from './pages/customer/ServiceHistoryPage'
 
 // Provider pages
-import ProviderDashboard from './pages/provider/ProviderDashboard'
-import ProviderJobsPage from './pages/provider/ProviderJobsPage'
-import JobDetailPage from './pages/provider/JobDetailPage'
 import AvailabilityPage from './pages/provider/AvailabilityPage'
 import EarningsPage from './pages/provider/EarningsPage'
+import JobDetailPage from './pages/provider/JobDetailPage'
+import ProviderDashboard from './pages/provider/ProviderDashboard'
+import ProviderJobsPage from './pages/provider/ProviderJobsPage'
 import ProviderProfileEditPage from './pages/provider/ProviderProfileEditPage'
 
 // Admin pages
-import AdminDashboard from './pages/admin/AdminDashboard'
-import AdminUsersPage from './pages/admin/AdminUsersPage'
-import AdminProvidersPage from './pages/admin/AdminProvidersPage'
-import AdminBookingsPage from './pages/admin/AdminBookingsPage'
-import AdminDisputesPage from './pages/admin/AdminDisputesPage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
+import AdminBookingsPage from './pages/admin/AdminBookingsPage'
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminDisputesPage from './pages/admin/AdminDisputesPage'
+import AdminProvidersPage from './pages/admin/AdminProvidersPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#E1F8DC' }}>
-      <div className="text-center">
-        <p className="text-8xl font-extrabold mb-4" style={{ color: '#ABDDDE' }}>404</p>
-        <h1 className="text-2xl font-bold text-text-primary mb-2">Page Not Found</h1>
-        <p className="text-text-muted mb-6">The page you're looking for doesn't exist.</p>
-        <a href="/" className="btn-navy">Go Home</a>
+    <PublicLayout navVariant="light">
+      <div className="relative isolate overflow-hidden bg-cream-section">
+        <div className="page-container flex min-h-[calc(100vh-16rem)] items-center justify-center py-16">
+          <div className="w-full max-w-2xl text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-aqua/30 text-brand-navy shadow-card">
+              <Search className="h-9 w-9" aria-hidden="true" />
+            </div>
+            <p className="mb-3 text-7xl font-display font-extrabold leading-none text-brand-navy md:text-9xl" aria-hidden="true">404</p>
+            <h1 className="text-3xl font-display font-bold text-text-primary md:text-4xl">Page not found</h1>
+            <p className="mx-auto mt-3 max-w-md text-text-muted">This page may have moved, or the address may be incorrect.</p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link to="/" className="btn-navy"><Home className="h-4 w-4" aria-hidden="true" /> Go home</Link>
+              <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse services</Link>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </PublicLayout>
   )
 }
 

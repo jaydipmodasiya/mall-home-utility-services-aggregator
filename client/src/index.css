@@ -122,8 +122,25 @@
     @apply form-input border-red-300 focus:border-red-400 focus:ring-red-100;
   }
 
+  .form-select,
+  .dropdown-select {
+    @apply w-full min-h-[44px] px-4 py-2.5 border border-brand-peach-warm rounded-lg
+           bg-white text-text-primary text-sm appearance-none cursor-pointer
+           focus:border-brand-aqua-dark focus:ring-2 focus:ring-brand-aqua/20
+           disabled:cursor-not-allowed disabled:opacity-60
+           transition-all duration-150;
+  }
+
   .form-select {
-    @apply form-input appearance-none cursor-pointer pr-10;
+    @apply pr-10;
+  }
+
+  .dropdown-select {
+    @apply pr-8;
+  }
+
+  select option {
+    @apply bg-white text-text-primary;
   }
 
   .form-textarea {

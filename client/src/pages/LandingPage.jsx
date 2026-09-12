@@ -216,7 +216,7 @@ export default function LandingPage() {
                     <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#ABDDDE' }} />
                     <select
                       id="hero-service"
-                      className="text-sm flex-1 outline-none appearance-none cursor-pointer"
+                      className="dropdown-select min-h-0 flex-1 border-0 px-0 py-0 outline-none focus:ring-0"
                       style={{ background: 'transparent', color: category ? '#0F2B3D' : '#9CA3AF' }}
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
