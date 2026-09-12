@@ -178,73 +178,10 @@
   }
 
   .route-error-panel { @apply relative rounded-2xl border border-white/80 bg-white/70 p-5 shadow-card backdrop-blur-sm sm:p-8 md:p-10; }
-  .developer-playground { @apply min-w-0 rounded-2xl border border-brand-aqua/40 bg-brand-navy p-4 shadow-card sm:p-5; }
-  .playground-tabs { @apply grid grid-cols-2 gap-1.5 rounded-lg bg-white/5 p-1 sm:grid-cols-4; }
-  .playground-tab { @apply min-w-0 rounded-md px-2 py-2 text-xs font-semibold leading-tight text-text-onDark/65 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .playground-tab-active { @apply bg-brand-aqua text-brand-navy; }
-  .developer-game-panel { @apply min-w-0 rounded-xl border border-white/10 bg-brand-navy-light/60 p-4; }
-  .playground-reset { @apply rounded-md p-1.5 text-brand-aqua/70 transition-colors hover:bg-white/10 hover:text-brand-aqua focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .playground-route { @apply flex min-w-0 items-center; }
-  .playground-route-step { @apply flex min-w-0 flex-1 items-center; }
-  .playground-node { @apply flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-brand-aqua bg-brand-navy text-xs font-bold text-brand-aqua transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy; }
-  .playground-node-selected { @apply border-brand-coral bg-brand-coral text-white; }
-  .playground-node-fixed { @apply border-brand-mint bg-brand-mint text-brand-navy; }
-  .playground-link { @apply h-0.5 min-w-2 flex-1 bg-brand-aqua/35 transition-colors; }
-  .playground-link-fixed { @apply bg-brand-mint; }
-  .playground-hint { @apply mt-4 min-h-10 text-xs leading-5 text-brand-aqua/75; }
-  .playground-snippets { @apply grid gap-2 sm:grid-cols-3; }
-  .playground-snippet { @apply flex min-w-0 items-start gap-2 rounded-lg border border-white/10 bg-black/15 p-3 text-left font-mono text-[11px] leading-5 text-white/80 transition-colors hover:border-brand-aqua/60 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .playground-snippet code { @apply min-w-0 break-words; }
-  .playground-snippet-picked { @apply border-brand-mint bg-brand-mint/15; }
-  .playground-node-grid { @apply grid grid-cols-4 gap-3 sm:gap-5; }
-  .playground-connect-node { @apply mx-auto flex h-11 w-11 items-center justify-center rounded-full border border-brand-aqua/60 bg-white/5 text-sm font-bold text-brand-aqua transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .playground-signal { @apply flex flex-wrap items-center gap-3 rounded-lg border border-white/10 bg-black/15 p-4; }
-  .playground-signal-line { @apply h-0.5 min-w-8 flex-1 bg-brand-coral/70; }
-  .playground-signal-live { @apply bg-brand-mint; }
-  .playground-signal-button { @apply h-7 w-7 rounded-full border-2 border-transparent transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .signal-amber { @apply bg-brand-peach; }
-  .signal-green { @apply bg-brand-mint; }
-  .signal-coral { @apply bg-brand-coral; }
-  .playground-signal-selected { @apply border-white; }
-
-  .simple-game-panel { @apply min-w-0 rounded-xl border border-white/10 bg-brand-navy-light/60 p-4; }
-  .simple-game-reset { @apply rounded-md p-2 text-brand-aqua/70 transition-colors hover:bg-white/10 hover:text-brand-aqua focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .simple-game-feedback { @apply mt-4 min-h-5 text-xs leading-5 text-brand-aqua/80; }
-  .catch-board { @apply relative h-28 overflow-hidden rounded-lg border border-white/10 bg-brand-navy; }
-  .catch-star { @apply absolute rounded-full p-2 text-brand-peach transition-transform hover:scale-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .catch-star-0 { left: 12%; top: 24%; }
-  .catch-star-1 { left: 70%; top: 60%; color: #CAF1DE; }
-  .catch-star-2 { left: 44%; top: 35%; color: #FEF9DC; }
-  .catch-star-3 { left: 82%; top: 14%; color: #F7D8BB; }
-  .catch-star-caught { @apply scale-125 text-white; }
-  .match-board { @apply grid grid-cols-4 gap-3; }
-  .match-card { @apply flex h-16 items-center justify-center rounded-lg border border-brand-aqua/40 bg-brand-aqua/10 text-xl font-bold text-brand-aqua transition-all hover:bg-brand-aqua/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .match-card-open { @apply border-brand-mint bg-brand-mint/20 text-brand-mint; }
-  .sort-board { @apply space-y-3; }
-  .sort-tools { @apply flex justify-around rounded-lg border border-white/10 bg-brand-navy p-3; }
-  .sort-tool { @apply rounded-lg bg-brand-aqua/15 p-3 text-brand-aqua transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .sort-tool-done { @apply bg-brand-mint text-brand-navy; }
-  .sort-labels { @apply grid grid-cols-3 gap-2 text-center text-[10px] text-text-onDark/60; }
-  .sort-label-done { @apply text-brand-mint; }
-  .path-board { @apply flex items-center gap-2 rounded-lg border border-white/10 bg-brand-navy p-4; }
-  .path-choice { @apply flex min-w-0 flex-1 items-center justify-center rounded-md border border-brand-aqua/40 py-3 text-brand-aqua transition-colors hover:bg-brand-aqua/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
-  .path-choice-0 { transform: translateY(-7px); }
-  .path-choice-1 { transform: translateY(7px); }
-  .path-choice-2 { transform: translateY(-7px); }
-  .path-choice-selected { @apply border-brand-mint bg-brand-mint/20 text-brand-mint; }
+  .quick-help-card { @apply min-w-0 rounded-2xl border border-brand-aqua/40 bg-white p-6 shadow-card sm:p-8; }
+  .quick-help-link { @apply flex min-h-12 items-center justify-between gap-3 rounded-lg border border-brand-peach-warm/70 bg-surface-secondary px-4 py-3 text-sm font-semibold text-text-primary transition-colors hover:border-brand-aqua-dark hover:bg-brand-aqua/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
 
   @media (prefers-reduced-motion: no-preference) {
-    .playground-link-fixed { animation: route-connect 500ms ease-out; }
-    .playground-node-fixed { animation: route-pop 350ms ease-out; }
-  }
-
-  @keyframes route-connect {
-    from { opacity: 0.35; transform: scaleX(0.4); transform-origin: left; }
-    to { opacity: 1; transform: scaleX(1); transform-origin: left; }
-  }
-
-  @keyframes route-pop {
-    50% { transform: scale(1.15); }
   }
 
   .form-textarea {

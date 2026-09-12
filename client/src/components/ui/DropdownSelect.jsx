@@ -21,6 +21,15 @@ export function DropdownSelect({ label, value, options, onChange, placeholder = 
     if (open) setHighlighted(selectedIndex)
   }, [open, selectedIndex])
 
+  useEffect(() => {
+    if (!open) return undefined
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [open])
+
   const choose = (option) => {
     if (option?.disabled) return
     onChange(option.value)

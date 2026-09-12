@@ -195,10 +195,10 @@ export default function LandingPage() {
                 className="relative z-30 bg-white rounded-2xl border mb-5"
                 style={{ borderColor: '#D4E8E8', boxShadow: '0 2px 16px rgba(15,43,61,0.07)' }}
               >
-                <div className="flex flex-col sm:flex-row">
+                <div className="grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
                   {/* City */}
-                  <label className="sr-only" htmlFor="hero-city">City</label>
-                  <div className="flex min-w-0 flex-1 items-center gap-2.5 border-b px-4 py-3.5 sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
+                  <label className="sr-only" htmlFor="hero-city">City or area</label>
+                  <div className="flex min-h-14 min-w-0 items-center gap-2.5 border-b px-4 py-3.5 sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
                     <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: '#ABDDDE' }} />
                     <input
                       id="hero-city"
@@ -213,7 +213,7 @@ export default function LandingPage() {
                   </div>
                   {/* Service */}
                   <label className="sr-only" htmlFor="hero-service">Service</label>
-                  <div className="flex items-center gap-2.5 flex-1 px-4 py-3.5 border-b sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
+                  <div className="flex min-h-14 min-w-0 items-center gap-2.5 border-b px-4 py-3.5 sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
                     <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#ABDDDE' }} />
                     <DropdownSelect
                       className="min-w-0 flex-1"
@@ -227,7 +227,7 @@ export default function LandingPage() {
                   <button
                     type="submit"
                     id="hero-search-btn"
-                    className="font-semibold text-sm px-6 py-3.5 transition-colors whitespace-nowrap"
+                    className="min-h-14 px-6 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors"
                     style={{ background: '#0F2B3D', color: '#ABDDDE' }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#1B4060' }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = '#0F2B3D' }}

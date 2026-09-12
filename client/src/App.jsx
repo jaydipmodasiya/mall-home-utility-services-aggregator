@@ -2,7 +2,6 @@ import { ArrowLeft, Home } from 'lucide-react'
 import { Link, Route, Routes } from 'react-router-dom'
 import { PublicLayout } from './components/layout/Layout'
 import ProtectedRoute from './components/layout/ProtectedRoute'
-import DeveloperPlayground from './components/ui/DeveloperPlayground'
 import { PageLoader } from './components/ui/Spinner'
 import { useAuth } from './context/AuthContext'
 
@@ -56,7 +55,16 @@ function NotFound() {
                   <Link to="/services" className="btn-secondary"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Browse Services</Link>
                 </div>
               </div>
-              <DeveloperPlayground />
+              <aside className="quick-help-card" aria-labelledby="quick-help-title">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-aqua-deep">Quick Help</p>
+                <h2 id="quick-help-title" className="mt-2 text-2xl font-display font-bold text-text-primary">Need a way back?</h2>
+                <p className="mt-2 text-sm leading-6 text-text-muted">Choose a familiar starting point and continue finding trusted local services.</p>
+                <div className="mt-6 grid gap-3">
+                  <Link to="/providers" className="quick-help-link"><span>Find Providers</span><ArrowLeft className="h-4 w-4 rotate-180" aria-hidden="true" /></Link>
+                  <Link to="/services" className="quick-help-link"><span>Browse Services</span><ArrowLeft className="h-4 w-4 rotate-180" aria-hidden="true" /></Link>
+                  <Link to="/customer/dashboard" className="quick-help-link"><span>Go to Dashboard</span><ArrowLeft className="h-4 w-4 rotate-180" aria-hidden="true" /></Link>
+                </div>
+              </aside>
             </div>
           </div>
         </div>

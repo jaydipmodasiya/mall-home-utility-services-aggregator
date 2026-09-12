@@ -70,9 +70,11 @@ export default function ProviderSearchPage() {
         <div className="relative z-20 bg-white rounded-xl border border-brand-peach-warm/60 p-4 mb-6">
           <div className="grid gap-3 md:grid-cols-[minmax(240px,1.8fr)_repeat(3,minmax(150px,1fr))]">
             {/* City search */}
-            <div className="flex-1 relative">
-              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light" />
+            <div className="relative min-w-0">
+              <label className="form-label" htmlFor="provider-location">City or area</label>
+              <MapPin className="absolute left-3.5 top-[2.65rem] w-4 h-4 -translate-y-1/2 text-text-light" />
               <input
+                id="provider-location"
                 type="text"
                 placeholder="Search by city or area..."
                 className="form-input h-11 pl-10"
