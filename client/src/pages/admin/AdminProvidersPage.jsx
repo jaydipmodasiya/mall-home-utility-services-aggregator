@@ -1,13 +1,11 @@
+import { CheckCircle, Eye, FileText, Shield, X, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { DashboardLayout } from '../../components/layout/Layout'
-import { SectionLoader, Spinner } from '../../components/ui/Spinner'
-import { EmptyState } from '../../components/ui/EmptyState'
-import { Avatar } from '../../components/ui/Avatar'
-import { RatingDisplay } from '../../components/ui/StarRating'
-import api from '../../services/api'
 import toast from 'react-hot-toast'
-import { formatDate } from '../../utils/constants'
-import { Shield, CheckCircle, XCircle, Eye, ChevronDown, FileText, X } from 'lucide-react'
+import { DashboardLayout } from '../../components/layout/Layout'
+import { Avatar } from '../../components/ui/Avatar'
+import { EmptyState } from '../../components/ui/EmptyState'
+import { SectionLoader, Spinner } from '../../components/ui/Spinner'
+import api from '../../services/api'
 
 // Static class maps — avoids unsafe dynamic Tailwind class generation
 const VERIFICATION_BADGE = {
@@ -53,6 +51,21 @@ export default function AdminProvidersPage() {
   }
 
   const verificationColors = { pending: 'amber', under_review: 'blue', approved: 'emerald', rejected: 'red' }
+
+  const openDocument = async (filename) => {
+    const token = localStorage.getItem('token')
+    const response = await fetch(`${(import.meta.env.VITE_API_URL || '/api')}/documents/${encodeURIComponent(filename)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    if (!response.ok) {
+      throw new Error('Unable to access document')
+    }
+
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <DashboardLayout role="admin">
@@ -127,7 +140,22 @@ export default function AdminProvidersPage() {
                 <p className="text-sm"><span className="font-semibold">Services:</span> {selected.serviceCategories?.join(', ')}</p>
                 <p className="text-sm"><span className="font-semibold">Experience:</span> {selected.experience} years</p>
                 <p className="text-sm"><span className="font-semibold">Location:</span> {selected.location?.city}, {selected.location?.state}</p>
-                <p className="text-sm"><span className="font-semibold">Documents:</span> {selected.documents?.length || 0} uploaded</p>
+                <div className="text-sm">
+                  <span className="font-semibold">Documents:</span>
+                  <div className="mt-2 space-y-2">
+                    {selected.documents?.length ? selected.documents.map((doc) => (
+                      <div key={doc.filename} className="flex items-center justify-between gap-3 rounded-lg border border-brand-peach-warm bg-surface-secondary p-2">
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-medium text-text-primary">{doc.originalName || doc.filename}</p>
+                          <p className="text-[10px] text-text-muted uppercase">{doc.type || 'verification'}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button type="button" onClick={() => openDocument(doc.filename).catch(() => toast.error('Unable to open document. Please try again.'))} className="btn-ghost text-xs px-2 py-1.5">Open</button>
+                        </div>
+                      </div>
+                    )) : <p className="text-text-muted mt-1">No documents uploaded.</p>}
+                  </div>
+                </div>
               </div>
             )}
             <div className="mb-4">

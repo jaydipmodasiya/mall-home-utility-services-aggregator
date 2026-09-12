@@ -35,7 +35,10 @@ export default function LoginPage() {
       const dest = from || (user.role === 'admin' ? '/admin/dashboard' : user.role === 'provider' ? '/provider/dashboard' : '/customer/dashboard')
       navigate(dest, { replace: true })
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed. Please try again.')
+      const message = err.response?.status === 401
+        ? 'Invalid email or password.'
+        : (err.response?.data?.message || 'Login failed. Please try again.')
+      toast.error(message)
     } finally { setLoading(false) }
   }
 

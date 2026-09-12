@@ -2,6 +2,19 @@ const ServiceProvider = require('../models/ServiceProvider');
 const User = require('../models/User');
 const path = require('path');
 
+const VALID_PROVIDER_DOCUMENT_TYPES = new Set([
+  'identity',
+  'identity_verification',
+  'skill',
+  'skill_certificate',
+  'skill_verification',
+]);
+
+const normalizeDocumentType = (value) => {
+  const raw = String(value || 'identity').toLowerCase().trim();
+  return VALID_PROVIDER_DOCUMENT_TYPES.has(raw) ? raw : 'identity';
+};
+
 // @desc   Search / list providers
 // @route  GET /api/providers
 // @access Public
@@ -115,10 +128,58 @@ exports.updateMyProfile = async (req, res, next) => {
 exports.updateAvailability = async (req, res, next) => {
   try {
     const { isAvailable, availabilitySlots } = req.body;
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+    const safeSlots = Array.isArray(availabilitySlots) ? availabilitySlots : [];
+    const normalizedSlots = [];
+
+    for (const slot of safeSlots) {
+      if (!slot || typeof slot !== 'object') continue;
+
+      if (!days.includes(slot.day)) {
+        return res.status(400).json({ success: false, message: 'Invalid availability day' });
+      }
+
+      const startTime = typeof slot.startTime === 'string' ? slot.startTime.trim() : '';
+      const endTime = typeof slot.endTime === 'string' ? slot.endTime.trim() : '';
+      if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(startTime) || !/^([01]\d|2[0-3]):([0-5]\d)$/.test(endTime)) {
+        return res.status(400).json({ success: false, message: 'Availability times must use HH:MM format' });
+      }
+
+      const startMinutes = Number(startTime.split(':')[0]) * 60 + Number(startTime.split(':')[1]);
+      const endMinutes = Number(endTime.split(':')[0]) * 60 + Number(endTime.split(':')[1]);
+      if (startMinutes >= endMinutes) {
+        return res.status(400).json({ success: false, message: 'Availability start time must be earlier than end time' });
+      }
+
+      normalizedSlots.push({ day: slot.day, startTime, endTime });
+    }
+
+    const grouped = new Map();
+    for (const slot of normalizedSlots) {
+      const entries = grouped.get(slot.day) || [];
+      entries.push({
+        start: Number(slot.startTime.split(':')[0]) * 60 + Number(slot.startTime.split(':')[1]),
+        end: Number(slot.endTime.split(':')[0]) * 60 + Number(slot.endTime.split(':')[1]),
+      });
+      grouped.set(slot.day, entries);
+    }
+
+    for (const [day, entries] of grouped.entries()) {
+      for (let i = 0; i < entries.length; i += 1) {
+        for (let j = i + 1; j < entries.length; j += 1) {
+          const a = entries[i];
+          const b = entries[j];
+          if (a.start < b.end && b.start < a.end) {
+            return res.status(400).json({ success: false, message: `Overlapping availability slots are not allowed for ${day}` });
+          }
+        }
+      }
+    }
 
     const provider = await ServiceProvider.findOneAndUpdate(
       { userId: req.user._id },
-      { isAvailable, availabilitySlots },
+      { isAvailable, availabilitySlots: normalizedSlots },
       { new: true }
     );
 
@@ -144,8 +205,14 @@ exports.uploadDocument = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Provider profile not found' });
     }
 
+    const allowedType = normalizeDocumentType(type);
+    const hasRequestedType = provider.documents.some((doc) => normalizeDocumentType(doc.type) === allowedType);
+    if (hasRequestedType) {
+      return res.status(400).json({ success: false, message: 'A document of this type is already uploaded.' });
+    }
+
     provider.documents.push({
-      type: type || 'identity',
+      type: allowedType,
       filename: req.file.filename,
       originalName: req.file.originalname,
     });
@@ -197,7 +264,24 @@ exports.adminVerifyProvider = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid status' });
     }
 
-    const provider = await ServiceProvider.findByIdAndUpdate(
+    const provider = await ServiceProvider.findById(req.params.id);
+    if (!provider) {
+      return res.status(404).json({ success: false, message: 'Provider not found' });
+    }
+
+    if (status === 'approved') {
+      const hasIdentityDoc = provider.documents.some((doc) => ['identity', 'identity_verification'].includes(String(doc.type || '').toLowerCase()));
+      const hasSkillDoc = provider.documents.some((doc) => ['skill', 'skill_certificate', 'skill_verification'].includes(String(doc.type || '').toLowerCase()));
+      const hasRequiredDocs = hasIdentityDoc || hasSkillDoc;
+      if (!hasRequiredDocs) {
+        return res.status(400).json({
+          success: false,
+          message: 'Provider cannot be approved without an identity or skill verification document.',
+        });
+      }
+    }
+
+    const updatedProvider = await ServiceProvider.findByIdAndUpdate(
       req.params.id,
       {
         verificationStatus: status,
@@ -207,11 +291,11 @@ exports.adminVerifyProvider = async (req, res, next) => {
       { new: true }
     ).populate('userId', 'name email');
 
-    if (!provider) {
+    if (!updatedProvider) {
       return res.status(404).json({ success: false, message: 'Provider not found' });
     }
 
-    res.json({ success: true, message: `Provider ${status}`, provider });
+    res.json({ success: true, message: `Provider ${status}`, provider: updatedProvider });
   } catch (error) {
     next(error);
   }

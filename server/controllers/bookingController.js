@@ -271,12 +271,12 @@ exports.updateBookingStatus = async (req, res, next) => {
 
     if (status === 'completed') {
       booking.completedAt = new Date();
-      // Update provider earnings from server-calculated amount
-      if (providerProfile) {
+      const bookingProvider = await ServiceProvider.findById(booking.providerId);
+      if (bookingProvider) {
         const earned = booking.finalAmount > 0 ? booking.finalAmount : booking.estimatedAmount;
-        providerProfile.totalEarnings += earned;
-        providerProfile.completedJobs += 1;
-        await providerProfile.save();
+        bookingProvider.totalEarnings = Number(bookingProvider.totalEarnings || 0) + Number(earned || 0);
+        bookingProvider.completedJobs = Number(bookingProvider.completedJobs || 0) + 1;
+        await bookingProvider.save();
       }
     }
 

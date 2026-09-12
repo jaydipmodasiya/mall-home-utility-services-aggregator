@@ -134,7 +134,7 @@ VITE_API_URL=http://localhost:5000/api
 
 For a deployed backend, set:
 ```bash
-VITE_API_URL=https://your-backend-domain/api
+VITE_API_URL=https://YOUR-BACKEND.onrender.com/api
 ```
 
 > ⚠️ **Security**: Never commit `.env` files. Keep secrets out of source control and set them in your hosting platform.
@@ -168,7 +168,7 @@ npm run dev
 # → http://localhost:5173
 ```
 
-> The frontend reads `VITE_API_URL` in production, and falls back to `/api` for local Vite proxy requests. Local dev keeps the proxy pattern, while deployed clients call the deployed backend URL directly.
+> The frontend reads `VITE_API_URL` in production and falls back to `/api` for local Vite proxy requests. Local development continues through the Vite proxy while deployed clients call the Render backend directly.
 
 ---
 
@@ -292,7 +292,7 @@ npm run build
 
 Set environment variable in Vercel:
 ```
-VITE_API_URL=https://your-backend.render.com
+VITE_API_URL=https://YOUR-BACKEND.onrender.com/api
 ```
 
 ### Backend → Render

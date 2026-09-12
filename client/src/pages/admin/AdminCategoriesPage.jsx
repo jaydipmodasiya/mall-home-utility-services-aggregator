@@ -1,4 +1,4 @@
-import { Edit2, Plus, Save, Tag, X } from 'lucide-react'
+import { Edit2, Save, Tag, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
@@ -17,38 +17,34 @@ export default function AdminCategoriesPage() {
     try {
       const { data } = await api.get('/categories')
       setCategories(data.categories || [])
-    } catch {} finally { setLoading(false) }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to load categories. Please try again.')
+    } finally { setLoading(false) }
   }
 
   useEffect(() => { fetch() }, [])
 
   const handleSave = async () => {
+    if (!editing?._id) return
+
     setSaving(true)
     try {
-      if (editing._id) {
-        await api.patch(`/admin/categories/${editing._id}`, editing)
-        toast.success('Category updated!')
-      } else {
-        await api.post('/admin/categories', editing)
-        toast.success('Category created!')
-      }
+      await api.patch(`/admin/categories/${editing._id}`, editing)
+      toast.success('Category updated!')
       setEditing(null)
       fetch()
-    } catch (e) { toast.error(e.response?.data?.message || 'Failed') } finally { setSaving(false) }
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Unable to update category. Please try again.')
+    } finally { setSaving(false) }
   }
-
-  const blank = { name: '', displayName: '', description: '', basePrice: 0, pricingGuideline: '' }
 
   return (
     <DashboardLayout role="admin">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Service Categories</h1>
-          <p className="text-text-muted text-sm mt-1">Manage pricing guidelines and category info</p>
+          <h1 className="text-2xl font-bold text-text-primary">Manage Categories</h1>
+          <p className="text-text-muted text-sm mt-1">The system maintains five fixed categories for service matching.</p>
         </div>
-        <button onClick={() => setEditing(blank)} className="btn-primary text-sm">
-          <Plus className="w-4 h-4" /> Add Category
-        </button>
       </div>
 
       {loading ? (
@@ -61,7 +57,7 @@ export default function AdminCategoriesPage() {
                 <div className="w-11 h-11 rounded-xl bg-brand-peach-warm flex items-center justify-center">
                   <Tag className="w-5 h-5 text-brand-navy-mid" />
                 </div>
-                <button onClick={() => setEditing({ ...cat })} className="btn-ghost p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => setEditing({ ...cat })} className="btn-ghost p-1.5 opacity-100 transition-opacity">
                   <Edit2 className="w-4 h-4" />
                 </button>
               </div>
@@ -77,24 +73,17 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
-      {/* Edit/Create Modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-4">
           <div className="card card-body w-full max-w-md animate-slide-up">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-text-primary">{editing._id ? 'Edit Category' : 'New Category'}</h3>
+              <h3 className="font-bold text-text-primary">Edit Category</h3>
               <button onClick={() => setEditing(null)} className="btn-ghost p-1.5"><X className="w-4 h-4" /></button>
             </div>
             <div className="space-y-3">
-              {!editing._id && (
-                <div>
-                  <label className="form-label">Category Key</label>
-                  <input className="form-input" placeholder="e.g. electrician" value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value.toLowerCase() })} />
-                </div>
-              )}
               <div>
-                <label className="form-label">Display Name</label>
-                <input className="form-input" value={editing.displayName} onChange={(e) => setEditing({ ...editing, displayName: e.target.value })} />
+                <label className="form-label">Category</label>
+                <input className="form-input bg-surface-secondary" value={editing.displayName} onChange={(e) => setEditing({ ...editing, displayName: e.target.value })} />
               </div>
               <div>
                 <label className="form-label">Description</label>

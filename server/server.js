@@ -59,11 +59,17 @@ app.get('/api/documents/:filename', protect, async (req, res, next) => {
 
 app.get('/api/health', async (req, res) => {
   const dbReady = mongoose.connection.readyState === 1;
-  res.status(dbReady ? 200 : 503).json({
-    success: dbReady,
-    message: dbReady ? 'API and database are ready' : 'API is running but database is not ready',
+  const apiReady = true;
+
+  res.status(apiReady && dbReady ? 200 : 503).json({
+    success: apiReady && dbReady,
+    message: dbReady ? 'API is healthy and database is ready' : 'API is running but database is not ready',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
+    api: {
+      status: 'up',
+      ready: apiReady,
+    },
     database: {
       ready: dbReady,
       state: mongoose.connection.readyState,
