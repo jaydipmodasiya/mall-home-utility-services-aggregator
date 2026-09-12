@@ -30,7 +30,7 @@ export default function JobDetailPage() {
     setUpdating(true)
     try {
       await api.patch(`/bookings/${id}/status`, { status, note })
-      toast.success(`Job ${status === 'assigned' ? 'accepted' : status === 'rejected' ? 'rejected' : status === 'in_progress' ? 'marked as in progress' : 'marked as completed'}!`)
+      toast.success(`Job ${status === 'assigned' ? 'assigned' : status === 'rejected' ? 'rejected' : status === 'in_progress' ? 'marked as in progress' : 'marked as completed'}!`)
       fetchBooking()
     } catch (e) { toast.error(e.response?.data?.message || 'Failed to update status') }
     finally { setUpdating(false) }

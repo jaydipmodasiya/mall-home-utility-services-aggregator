@@ -1,6 +1,7 @@
 const ServiceProvider = require('../models/ServiceProvider');
 const User = require('../models/User');
 const path = require('path');
+const { createNotification } = require('../utils/notify');
 
 const VALID_PROVIDER_DOCUMENT_TYPES = new Set([
   'identity',
@@ -15,33 +16,55 @@ const normalizeDocumentType = (value) => {
   return VALID_PROVIDER_DOCUMENT_TYPES.has(raw) ? raw : 'identity';
 };
 
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // @desc   Search / list providers
 // @route  GET /api/providers
 // @access Public
 exports.getProviders = async (req, res, next) => {
   try {
-    const { category, city, area, available, minRating, page = 1, limit = 12 } = req.query;
+    const { category, city, area, available, minRating, latitude, longitude, radiusKm = 25, page = 1, limit = 12 } = req.query;
+    const validCategories = ['electrician', 'plumber', 'carpenter', 'tailor', 'maintenance'];
+    if (category && !validCategories.includes(category)) {
+      return res.status(400).json({ success: false, message: 'Invalid service category' });
+    }
+    const rating = minRating === undefined || minRating === '' ? null : Number(minRating);
+    if (rating !== null && (!Number.isFinite(rating) || rating < 0 || rating > 5)) {
+      return res.status(400).json({ success: false, message: 'Invalid minimum rating' });
+    }
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 12));
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    const hasCoordinates = Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+    const radiusMeters = Math.min(100, Math.max(1, Number(radiusKm) || 25)) * 1000;
 
     const activeUsers = await User.find({ role: 'provider', isActive: true }).select('_id');
     const filter = { verificationStatus: 'approved', isVerified: true, userId: { $in: activeUsers.map((user) => user._id) } };
     if (category) filter.serviceCategories = category;
-    if (city) filter['location.city'] = { $regex: city, $options: 'i' };
-    if (area) filter['location.area'] = { $regex: area, $options: 'i' };
+    if (city) filter['location.city'] = { $regex: escapeRegex(city.slice(0, 100)), $options: 'i' };
+    if (area) filter['location.area'] = { $regex: escapeRegex(area.slice(0, 100)), $options: 'i' };
     if (available === 'true') filter.isAvailable = true;
-    if (minRating) filter.rating = { $gte: Number(minRating) };
+    if (rating !== null) filter.rating = { $gte: rating };
+    if (hasCoordinates) {
+      filter['location.coordinates'] = {
+        $near: { $geometry: { type: 'Point', coordinates: [lng, lat] }, $maxDistance: radiusMeters },
+      };
+    }
 
     const total = await ServiceProvider.countDocuments(filter);
     const providers = await ServiceProvider.find(filter)
       .populate('userId', 'name avatar')
-      .sort({ rating: -1, completedJobs: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .sort(hasCoordinates ? {} : { rating: -1, completedJobs: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
 
     res.json({
       success: true,
       total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
+      nearby: hasCoordinates,
       providers,
     });
   } catch (error) {
@@ -272,11 +295,11 @@ exports.adminVerifyProvider = async (req, res, next) => {
     if (status === 'approved') {
       const hasIdentityDoc = provider.documents.some((doc) => ['identity', 'identity_verification'].includes(String(doc.type || '').toLowerCase()));
       const hasSkillDoc = provider.documents.some((doc) => ['skill', 'skill_certificate', 'skill_verification'].includes(String(doc.type || '').toLowerCase()));
-      const hasRequiredDocs = hasIdentityDoc || hasSkillDoc;
-      if (!hasRequiredDocs) {
+      const hasRequiredDocs = hasIdentityDoc && hasSkillDoc;
+      if (!hasRequiredDocs && provider.verificationStatus !== 'approved') {
         return res.status(400).json({
           success: false,
-          message: 'Provider cannot be approved without an identity or skill verification document.',
+          message: 'Provider approval requires both identity and skill verification documents.',
         });
       }
     }
@@ -294,6 +317,14 @@ exports.adminVerifyProvider = async (req, res, next) => {
     if (!updatedProvider) {
       return res.status(404).json({ success: false, message: 'Provider not found' });
     }
+
+    await createNotification({
+      userId: updatedProvider.userId?._id || updatedProvider.userId,
+      type: `provider_${status}`,
+      title: 'Verification status updated',
+      message: `Your provider verification was ${status.replace('_', ' ')}.`,
+      metadata: { providerId: updatedProvider._id, status },
+    });
 
     res.json({ success: true, message: `Provider ${status}`, provider: updatedProvider });
   } catch (error) {

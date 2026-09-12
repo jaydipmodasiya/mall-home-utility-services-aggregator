@@ -1,6 +1,7 @@
 const Dispute = require('../models/Dispute');
 const Booking = require('../models/Booking');
 const ServiceProvider = require('../models/ServiceProvider');
+const { createNotification } = require('../utils/notify');
 
 // @desc   Raise a dispute
 // @route  POST /api/disputes
@@ -57,6 +58,14 @@ exports.createDispute = async (req, res, next) => {
 
     const populated = await dispute.populate('bookingId', 'serviceCategory serviceDescription status');
 
+    await createNotification({
+      userId: req.user._id,
+      type: 'dispute_created',
+      title: 'Dispute submitted',
+      message: 'Your dispute was submitted for admin review.',
+      metadata: { disputeId: dispute._id },
+    });
+
     res.status(201).json({ success: true, dispute: populated });
   } catch (error) {
     next(error);
@@ -88,6 +97,14 @@ exports.getDispute = async (req, res, next) => {
       .populate('resolvedBy', 'name email');
 
     if (!dispute) return res.status(404).json({ success: false, message: 'Dispute not found' });
+
+    await createNotification({
+      userId: dispute.raisedBy,
+      type: 'dispute_updated',
+      title: 'Dispute updated',
+      message: `Your dispute is now ${status.replace('_', ' ')}.`,
+      metadata: { disputeId: dispute._id, status },
+    });
 
     // Participants in the booking and admins can view the dispute.
     const isRaiser = dispute.raisedBy._id.toString() === req.user._id.toString();

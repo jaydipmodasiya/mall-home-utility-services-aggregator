@@ -12,11 +12,11 @@
 - Register / Login securely
 - Browse 5 service categories
 - Search providers by city, area, availability, rating
+- Use browser location to find providers within an approximate nearby radius
 - View provider profiles (skills, experience, pricing, reviews)
 - Book instantly or schedule for later
 - Track booking status through the booking timeline
 - Submit ratings & reviews after completed services
-- Raise disputes on completed jobs
 - View complete service history
 
 ### Service Provider
@@ -46,23 +46,21 @@
 | Icons | Lucide React |
 | Charts | Recharts |
 | Backend | Node.js + Express.js |
-| Database | MongoDB + Mongoose |
+| Database | MongoDB Atlas + Mongoose |
 | Auth | JWT + bcryptjs |
 | Validation | express-validator |
 | File Upload | Multer |
-| Notifications | In-app toast feedback for API actions |
+| Notifications | Persistent in-app notifications for booking, verification, and dispute events |
 
 ---
-
 ## 📁 Project Structure
 
 ```
-something/
 ├── client/                   # React + Vite frontend
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── layout/       # Navbar, Footer, Sidebar, Layout wrappers
-│   │   │   └── ui/           # Spinner, Avatar, StatusBadge, StarRating, etc.
+│   ├── components/           # Layout and reusable UI components
+│   │   ├── layout/           # Navbar, Footer, Sidebar, Layout wrappers
+│   │   └── ui/               # Shared states, dropdowns, avatars, badges
 │   │   ├── context/          # AuthContext
 │   │   ├── pages/
 │   │   │   ├── auth/         # Login, Register
@@ -77,9 +75,9 @@ something/
 │   ├── config/               # MongoDB connection
 │   ├── controllers/          # Auth, Provider, Booking, Review, Dispute, Category, Admin
 │   ├── middleware/            # JWT auth, validation, error handler
-│   ├── models/               # User, ServiceProvider, Booking, Category, Review, Dispute
+│   ├── models/               # User, ServiceProvider, Booking, Category, Review, Dispute, Notification
 │   ├── routes/               # Express routers
-│   ├── utils/                # Seed script
+│   ├── utils/                # Seed script and notification helper
 │   └── server.js
 │
 ├── docs/                     # PRD + Technical documentation
@@ -94,7 +92,7 @@ something/
 
 ### Prerequisites
 - Node.js >= 18
-- MongoDB running locally (or MongoDB Atlas URI)
+- MongoDB Atlas (or another reachable MongoDB deployment)
 
 ### 1. Clone & Install
 
@@ -132,9 +130,9 @@ Create a frontend environment file for production deployments:
 VITE_API_URL=http://localhost:5000/api
 ```
 
-For a deployed backend, set:
+For the deployed Render backend, set:
 ```bash
-VITE_API_URL=https://YOUR-BACKEND.onrender.com/api
+VITE_API_URL=https://mall-home-utility-api.onrender.com/api
 ```
 
 > ⚠️ **Security**: Never commit `.env` files. Keep secrets out of source control and set them in your hosting platform.
@@ -198,7 +196,7 @@ npm run dev
 ### Providers
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/providers` | — | Search/list approved providers |
+| GET | `/api/providers` | — | Search/list approved providers; optional `latitude`, `longitude`, and `radiusKm` enable nearby results |
 | GET | `/api/providers/:id` | — | Get provider profile |
 | GET | `/api/providers/me` | Provider | My provider profile |
 | PATCH | `/api/providers/me` | Provider | Update profile |
@@ -283,16 +281,16 @@ Invalid transitions are rejected server-side with a meaningful 400 error.
 
 ## ☁️ Deployment
 
-### Frontend → Vercel
+### Frontend → Netlify
 ```bash
 cd client
 npm run build
-# Deploy dist/ to Vercel
+# Deploy client/dist/ to Netlify
 ```
 
-Set environment variable in Vercel:
+Set environment variable in Netlify:
 ```
-VITE_API_URL=https://YOUR-BACKEND.onrender.com/api
+VITE_API_URL=https://mall-home-utility-api.onrender.com/api
 ```
 
 ### Backend → Render

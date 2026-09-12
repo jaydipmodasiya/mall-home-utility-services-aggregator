@@ -1,8 +1,9 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Bell, ChevronDown, LayoutDashboard, LogOut, Menu, Search, User, X, Zap } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../services/api'
 import { Avatar } from '../ui/Avatar'
-import { Zap, Menu, X, ChevronDown, LogOut, User, LayoutDashboard, Search } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
 
 export default function Navbar({ variant = 'dark' }) {
   const { user, logout } = useAuth()
@@ -10,16 +11,40 @@ export default function Navbar({ variant = 'dark' }) {
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropOpen, setDropOpen] = useState(false)
+  const [notificationOpen, setNotificationOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  const [unread, setUnread] = useState(0)
   const dropRef = useRef(null)
+  const notificationRef = useRef(null)
 
   const isLight = variant === 'light'
 
   useEffect(() => {
-    const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false) }
+    const handler = (e) => {
+      if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false)
+      if (notificationRef.current && !notificationRef.current.contains(e.target)) setNotificationOpen(false)
+    }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
+  useEffect(() => {
+    if (!user) return undefined
+    api.get('/notifications?limit=5').then(({ data }) => {
+      setNotifications(data.notifications || [])
+      setUnread(data.unread || 0)
+    }).catch(() => {})
+    return undefined
+  }, [user])
+
+  const markNotificationRead = async (notification) => {
+    if (notification.readAt) return
+    try {
+      await api.patch(`/notifications/${notification._id}/read`)
+      setNotifications((items) => items.map((item) => item._id === notification._id ? { ...item, readAt: new Date().toISOString() } : item))
+      setUnread((count) => Math.max(0, count - 1))
+    } catch {}
+  }
 
   const handleLogout = () => { logout(); navigate('/') }
 
@@ -88,6 +113,16 @@ export default function Navbar({ variant = 'dark' }) {
                       </div>
                     </div>
                   )}
+                </div>
+                <div className="relative" ref={notificationRef}>
+                  <button type="button" onClick={() => setNotificationOpen((open) => !open)} className={`relative rounded-lg p-2 transition-colors ${isLight ? 'text-text-muted hover:bg-gray-100' : 'text-text-onDark/70 hover:bg-white/10'}`} aria-label="Notifications" aria-expanded={notificationOpen}>
+                    <Bell className="h-4 w-4" />
+                    {unread > 0 && <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-brand-coral px-1 text-center text-[10px] font-bold text-white">{unread > 9 ? '9+' : unread}</span>}
+                  </button>
+                  {notificationOpen && <div className="absolute right-0 top-11 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-brand-peach-warm/60 bg-white p-3 shadow-modal">
+                    <div className="flex items-center justify-between border-b border-brand-peach-warm/40 px-2 pb-2"><p className="text-sm font-bold text-text-primary">Notifications</p><span className="text-xs text-text-muted">{unread} unread</span></div>
+                    <div className="max-h-72 overflow-y-auto py-1">{notifications.length ? notifications.map((notification) => <button type="button" key={notification._id} onClick={() => markNotificationRead(notification)} className={`w-full rounded-lg px-2 py-2 text-left hover:bg-surface-secondary ${notification.readAt ? '' : 'bg-brand-aqua/10'}`}><p className="text-xs font-semibold text-text-primary">{notification.title}</p><p className="mt-0.5 text-xs text-text-muted">{notification.message}</p></button>) : <p className="px-2 py-6 text-center text-xs text-text-muted">You're all caught up.</p>}</div>
+                  </div>}
                 </div>
               </div>
             ) : (

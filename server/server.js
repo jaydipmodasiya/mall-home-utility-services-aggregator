@@ -18,6 +18,8 @@ const reviewRoutes = require('./routes/reviews');
 const disputeRoutes = require('./routes/disputes');
 const categoryRoutes = require('./routes/categories');
 const adminRoutes = require('./routes/admin');
+const notificationRoutes = require('./routes/notifications');
+const discoveryRoutes = require('./routes/discovery');
 
 const app = express();
 
@@ -85,6 +87,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/disputes', disputeRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/discovery', discoveryRoutes);
 
 app.use('*', (req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });

@@ -1,7 +1,7 @@
 import { Calendar } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { DashboardLayout } from '../../components/layout/Layout'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { EmptyState, ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import api from '../../services/api'
@@ -13,9 +13,11 @@ export default function AdminBookingsPage() {
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [error, setError] = useState(false)
 
   const fetchBookings = async (status = statusFilter, category = categoryFilter) => {
     setLoading(true)
+    setError(false)
     try {
       const params = new URLSearchParams({ limit: 50 })
       if (status) params.set('status', status)
@@ -23,7 +25,7 @@ export default function AdminBookingsPage() {
       const { data } = await api.get(`/admin/bookings?${params}`)
       setBookings(data.bookings || [])
       setTotal(data.total || 0)
-    } catch { } finally { setLoading(false) }
+    } catch { setError(true) } finally { setLoading(false) }
   }
 
   useEffect(() => { fetchBookings() }, [])
@@ -58,7 +60,7 @@ export default function AdminBookingsPage() {
         </div>
       </div>
 
-      {loading ? <SectionLoader /> : bookings.length === 0 ? (
+      {loading ? <SectionLoader /> : error ? <ErrorState message="Couldn't load bookings. Please try again." onRetry={() => fetchBookings()} /> : bookings.length === 0 ? (
         <EmptyState title="No bookings found" icon={Calendar} />
       ) : (
         <div className="card overflow-hidden">

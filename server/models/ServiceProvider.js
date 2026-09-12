@@ -35,6 +35,7 @@ const serviceProviderSchema = new mongoose.Schema(
       area: { type: String, default: '' },
       state: { type: String, default: '' },
       pincode: { type: String, default: '' },
+      timezone: { type: String, default: 'Asia/Kolkata' },
       // Optional geospatial data for future location features. Avoid [0,0] as a meaningful location.
       coordinates: {
         type: { type: String, enum: ['Point'], default: null },

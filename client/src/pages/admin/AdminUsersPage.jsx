@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { Avatar } from '../../components/ui/Avatar'
 import { DropdownSelect } from '../../components/ui/DropdownSelect'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { EmptyState, ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import api from '../../services/api'
 import { formatDate } from '../../utils/constants'
@@ -16,9 +16,11 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState('')
   const [total, setTotal] = useState(0)
   const [actionId, setActionId] = useState(null)
+  const [error, setError] = useState(false)
 
   const fetchUsers = async (s = search, r = roleFilter) => {
     setLoading(true)
+    setError(false)
     try {
       const params = new URLSearchParams({ limit: 50 })
       if (s) params.set('search', s)
@@ -26,7 +28,7 @@ export default function AdminUsersPage() {
       const { data } = await api.get(`/admin/users?${params}`)
       setUsers(data.users || [])
       setTotal(data.total || 0)
-    } catch { } finally { setLoading(false) }
+    } catch { setError(true) } finally { setLoading(false) }
   }
 
   useEffect(() => { fetchUsers() }, [])
@@ -69,7 +71,7 @@ export default function AdminUsersPage() {
         <button onClick={() => fetchUsers(search, roleFilter)} className="btn-secondary">Search</button>
       </div>
 
-      {loading ? <SectionLoader /> : users.length === 0 ? (
+      {loading ? <SectionLoader /> : error ? <ErrorState message="Couldn't load users. Please try again." onRetry={() => fetchUsers()} /> : users.length === 0 ? (
         <EmptyState title="No users found" icon={Users} />
       ) : (
         <div className="card overflow-hidden">

@@ -1,5 +1,5 @@
+import { Mail, MapPin, Phone, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Zap, Phone, Mail, MapPin } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -43,10 +43,7 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-bold text-white mb-4">Company</h4>
             <ul className="space-y-2.5 text-sm">
-              <li><Link to="/" className="hover:text-brand-aqua transition-colors">About Us</Link></li>
               <li><Link to="/register?role=provider" className="hover:text-brand-aqua transition-colors">Become a Provider</Link></li>
-              <li><Link to="/" className="hover:text-brand-aqua transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/" className="hover:text-brand-aqua transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
 

@@ -3,6 +3,9 @@ const ServiceProvider = require('../models/ServiceProvider');
 const Booking = require('../models/Booking');
 const Review = require('../models/Review');
 const Dispute = require('../models/Dispute');
+const ProviderDiscovery = require('../models/ProviderDiscovery');
+
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // @desc   Get admin analytics / KPIs
 // @route  GET /api/admin/analytics
@@ -18,7 +21,9 @@ exports.getAnalytics = async (req, res, next) => {
       cancelledBookings,
       pendingBookings,
       openDisputes,
-      allReviews,
+      discoveryEvents,
+      ratingSummary,
+      completionSummary,
     ] = await Promise.all([
       User.countDocuments({ role: 'customer' }),
       User.countDocuments({ role: 'provider' }),
@@ -28,29 +33,17 @@ exports.getAnalytics = async (req, res, next) => {
       Booking.countDocuments({ status: 'cancelled' }),
       Booking.countDocuments({ status: { $in: ['pending', 'assigned', 'in_progress'] } }),
       Dispute.countDocuments({ status: 'open' }),
-      Review.find().select('rating'),
+      ProviderDiscovery.countDocuments(),
+      Review.aggregate([{ $group: { _id: null, average: { $avg: '$rating' } } }]),
+      Booking.aggregate([
+        { $match: { status: 'completed', completedAt: { $exists: true } } },
+        { $project: { hours: { $divide: [{ $subtract: ['$completedAt', '$createdAt'] }, 3600000] } } },
+        { $group: { _id: null, average: { $avg: '$hours' } } },
+      ]),
     ]);
 
-    // Average satisfaction rating
-    const avgRating =
-      allReviews.length > 0
-        ? (allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length).toFixed(1)
-        : 0;
-
-    // Average completion time (in hours)
-    const completedWithTime = await Booking.find({
-      status: 'completed',
-      completedAt: { $exists: true },
-    }).select('createdAt completedAt');
-    const avgCompletionHours =
-      completedWithTime.length > 0
-        ? (
-            completedWithTime.reduce((sum, b) => {
-              const diff = (new Date(b.completedAt) - new Date(b.createdAt)) / 3600000;
-              return sum + diff;
-            }, 0) / completedWithTime.length
-          ).toFixed(1)
-        : 0;
+    const avgRating = Number((ratingSummary[0]?.average || 0).toFixed(1));
+    const avgCompletionHours = Number((completionSummary[0]?.average || 0).toFixed(1));
 
     // Bookings by category
     const bookingsByCategory = await Booking.aggregate([
@@ -87,6 +80,8 @@ exports.getAnalytics = async (req, res, next) => {
         avgCompletionHours: Number(avgCompletionHours),
         recentUsers,
         completionRate: totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 0,
+        providerDiscoveryEvents: discoveryEvents,
+        bookingConversionRate: discoveryEvents > 0 ? Number(((totalBookings / discoveryEvents) * 100).toFixed(1)) : 0,
       },
       charts: { bookingsByCategory, bookingsByMonth },
     });
@@ -101,17 +96,19 @@ exports.getAnalytics = async (req, res, next) => {
 exports.getUsers = async (req, res, next) => {
   try {
     const { role, page = 1, limit = 20, search } = req.query;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
     const filter = {};
-    if (role) filter.role = role;
-    if (search) filter.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }];
+    if (role && ['customer', 'provider', 'admin'].includes(role)) filter.role = role;
+    if (search) filter.$or = [{ name: { $regex: escapeRegex(search.slice(0, 100)), $options: 'i' } }, { email: { $regex: escapeRegex(search.slice(0, 100)), $options: 'i' } }];
 
     const total = await User.countDocuments(filter);
     const users = await User.find(filter)
       .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
 
-    res.json({ success: true, total, users });
+    res.json({ success: true, total, page: pageNum, pages: Math.ceil(total / limitNum), users });
   } catch (error) {
     next(error);
   }
@@ -132,13 +129,8 @@ exports.updateUser = async (req, res, next) => {
     const updates = {};
     if (typeof isActive === 'boolean') updates.isActive = isActive;
 
-    // Role changes: only allow customer/provider — admin role cannot be granted via API
     if (role !== undefined) {
-      const ALLOWED_ROLES = ['customer', 'provider'];
-      if (!ALLOWED_ROLES.includes(role)) {
-        return res.status(400).json({ success: false, message: 'Invalid role. Admin role can only be set via database.' });
-      }
-      updates.role = role;
+      return res.status(400).json({ success: false, message: 'Role changes are disabled. Use explicit provider registration.' });
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true });

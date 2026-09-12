@@ -1,9 +1,10 @@
 const Booking = require('../models/Booking');
 const ServiceProvider = require('../models/ServiceProvider');
+const { createNotification } = require('../utils/notify');
 
 /* ─────────────────────────────────────────────────────
    Valid status transitions (server-authoritative)
-   'accepted' removed — provider accepting = 'assigned'
+  Provider acceptance is represented by the 'assigned' state.
 ───────────────────────────────────────────────────── */
 const ALLOWED_TRANSITIONS = {
   provider: {
@@ -22,7 +23,16 @@ const ALLOWED_TRANSITIONS = {
   },
 };
 
-const getDayName = (date) => date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+const getLocalDateParts = (date, timeZone = 'Asia/Kolkata') => {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date).reduce((result, part) => ({ ...result, [part.type]: part.value }), {});
+  return { day: parts.weekday.toLowerCase(), minutes: Number(parts.hour) * 60 + Number(parts.minute) };
+};
 
 const timeToMinutes = (value) => {
   const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value || '');
@@ -46,6 +56,9 @@ exports.createBooking = async (req, res, next) => {
     if (!serviceLocation.address || !serviceLocation.city) {
       return res.status(400).json({ success: false, message: 'Service location address and city are required' });
     }
+    const locationType = ['residential', 'apartment', 'commercial', 'mall'].includes(serviceLocation.locationType)
+      ? serviceLocation.locationType
+      : 'residential';
 
     // ── Validate category enum ────────────────────────
     const VALID_CATS = ['electrician', 'plumber', 'carpenter', 'tailor', 'maintenance'];
@@ -87,14 +100,14 @@ exports.createBooking = async (req, res, next) => {
     }
 
     if (bType === 'scheduled') {
-      const day = getDayName(new Date(scheduledAt));
+      const requestedDate = new Date(scheduledAt);
+      const localParts = getLocalDateParts(requestedDate, provider.location?.timezone || 'Asia/Kolkata');
       const requestedStart = new Date(scheduledAt);
       const requestedEnd = new Date(requestedStart.getTime() + 60 * 60 * 1000);
       const matchingSlot = provider.availabilitySlots.find((slot) => {
         const start = timeToMinutes(slot.startTime);
         const end = timeToMinutes(slot.endTime);
-        const requested = requestedStart.getHours() * 60 + requestedStart.getMinutes();
-        return slot.day === day && start !== null && end !== null && start <= requested && end >= requested + 60;
+        return slot.day === localParts.day && start !== null && end !== null && start <= localParts.minutes && end >= localParts.minutes + 60;
       });
       if (!matchingSlot) {
         return res.status(400).json({ success: false, message: 'Provider is not available at the requested time' });
@@ -127,6 +140,7 @@ exports.createBooking = async (req, res, next) => {
         area: serviceLocation.area?.trim() || '',
         pincode: serviceLocation.pincode?.trim() || '',
         landmark: serviceLocation.landmark?.trim() || '',
+        locationType,
       },
       estimatedAmount,           // server-calculated only
       statusHistory: [{ previousStatus: null, status: 'pending', changedBy: req.user._id }],
@@ -136,6 +150,14 @@ exports.createBooking = async (req, res, next) => {
       { path: 'customerId', select: 'name email phone' },
       { path: 'providerId', populate: { path: 'userId', select: 'name phone' } },
     ]);
+
+    await createNotification({
+      userId: provider.userId._id,
+      type: 'booking_created',
+      title: 'New booking request',
+      message: `A customer requested ${serviceCategory} service in ${serviceLocation.city.trim()}.`,
+      metadata: { bookingId: booking._id },
+    });
 
     res.status(201).json({ success: true, booking: populated });
   } catch (error) {
@@ -286,6 +308,15 @@ exports.updateBookingStatus = async (req, res, next) => {
     }
 
     await booking.save();
+    const providerRecipient = await ServiceProvider.findById(booking.providerId).select('userId');
+    const recipientId = role === 'provider' || role === 'admin' ? booking.customerId : providerRecipient?.userId;
+    await createNotification({
+      userId: recipientId,
+      type: `booking_${status}`,
+      title: 'Booking status updated',
+      message: `Your booking is now ${status.replace('_', ' ')}.`,
+      metadata: { bookingId: booking._id, status },
+    });
     res.json({ success: true, booking, previousStatus });
   } catch (error) {
     next(error);

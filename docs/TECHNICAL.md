@@ -14,7 +14,8 @@
                      │ /api/*
 ┌────────────────────▼────────────────────────────────┐
 │               SERVER (Node.js + Express)             │
-│  JWT Auth · express-validator · Multer · Morgan      │
+  status: String,          // pending|assigned|in_progress|completed|cancelled|rejected
+  locationType: String,    // optional: residential | apartment | commercial | mall
 └────────────────────┬────────────────────────────────┘
                      │ Mongoose ODM
 ┌────────────────────▼────────────────────────────────┐
@@ -24,6 +25,7 @@
 ```
 
 ---
+
 
 ## 2. Database Schema
 
@@ -40,7 +42,6 @@
     street, city, state, pincode
   },
   isActive: Boolean,     // default: true
-  timestamps: true
 }
 ```
 
@@ -59,6 +60,7 @@
   },
   location: {
     city, area, state, pincode,
+    timezone: String,     // default: 'Asia/Kolkata'
     coordinates: { type: 'Point', coordinates: [lng, lat] }
   },
   isVerified: Boolean,
@@ -85,7 +87,7 @@
   serviceDescription: String,
   bookingType: String,     // instant | scheduled
   scheduledAt: Date,
-  serviceLocation: { address, city, area, pincode, landmark },
+  serviceLocation: { address, city, area, pincode, landmark, locationType },
   status: String,          // pending|assigned|in_progress|completed|cancelled|rejected
   statusHistory: [{ status, changedAt, changedBy, note }],
   estimatedAmount: Number,
@@ -97,6 +99,8 @@
   timestamps: true
 }
 ```
+
+`locationType` is optional for backward compatibility and accepts `residential`, `apartment`, `commercial`, or `mall`. Scheduled timestamps are stored as UTC dates; provider availability slots are interpreted in the provider's `location.timezone` (default `Asia/Kolkata`).
 
 ### 2.4 Review
 ```js
@@ -267,6 +271,14 @@ Custom Classes:
 | Role escalation | Admin role blocked at registration API |
 | Env secrets | All in .env, excluded from git |
 
+## 6.1 Notifications and conversion metric
+
+Authenticated users can read and mark notifications through `GET /api/notifications`, `PATCH /api/notifications/:id/read`, and `PATCH /api/notifications/read-all`. Booking, provider verification, and dispute events create persistent records; no WebSockets are used.
+
+Provider discovery supports optional browser geolocation coordinates. `GET /api/providers` accepts `latitude`, `longitude`, and `radiusKm` and uses the provider 2dsphere index for nearby results; no paid map SDK or hardcoded map key is used.
+
+Admin `bookingConversionRate` is calculated as booking records divided by recorded provider-discovery events, expressed as a percentage. `providerDiscoveryEvents` is exposed alongside the KPI so the denominator is visible and a zero-event period reports 0 rather than an invented rate.
+
 ---
 
 ## 7. Environment Variables
@@ -274,11 +286,12 @@ Custom Classes:
 ### Server (`server/.env`)
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/mall-utility-db
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
 JWT_SECRET=your_super_secret_jwt_key_change_in_production
 JWT_EXPIRE=7d
 NODE_ENV=development
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=https://mall-home-utility-services-aggregator.netlify.app
+DNS_WORKAROUND=false
 ```
 
 ---
@@ -286,8 +299,7 @@ CLIENT_URL=http://localhost:5173
 ## 8. Running Locally
 
 ```bash
-# 1. Start MongoDB locally
-mongod
+# 1. Configure a reachable MongoDB Atlas URI in server/.env
 
 # 2. Start server (Terminal 1)
 cd server
@@ -305,12 +317,13 @@ npm run dev    # runs on :5173
 
 ## 9. Deployment
 
-### Frontend (Vercel)
+### Frontend (Netlify)
 1. Push code to GitHub
-2. Connect repo to Vercel
+2. Connect repo to Netlify
 3. Set root directory: `client`
 4. Build command: `npm run build`
-5. Output directory: `dist`
+5. Output directory: `client/dist`
+6. Set `VITE_API_URL=https://mall-home-utility-api.onrender.com/api`
 
 ### Backend (Render)
 1. Connect repo to Render

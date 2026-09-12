@@ -2,6 +2,7 @@ import { Briefcase, Star, TrendingUp, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { DashboardLayout } from '../../components/layout/Layout'
+import { ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import api from '../../services/api'
 
@@ -11,15 +12,21 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 export default function AdminAnalyticsPage() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  useEffect(() => {
+  const fetchAnalytics = () => {
+    setLoading(true)
+    setError(false)
     api.get('/admin/analytics')
       .then(({ data: d }) => setData(d))
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { fetchAnalytics() }, [])
 
   if (loading) return <DashboardLayout role="admin"><SectionLoader /></DashboardLayout>
+  if (error) return <DashboardLayout role="admin"><ErrorState message="Couldn't load analytics right now. Please try again." onRetry={fetchAnalytics} /></DashboardLayout>
 
   const monthlyData = data?.charts?.bookingsByMonth?.map((b) => ({
     name: MONTHS[(b._id.month || 1) - 1],
@@ -39,11 +46,12 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* KPI summary row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {[
           { label: 'Total Customers', value: data?.kpis?.totalUsers, icon: Users, color: 'bg-blue-50 text-blue-600' },
           { label: 'Verified Providers', value: data?.kpis?.verifiedProviders, icon: TrendingUp, color: 'bg-violet-50 text-violet-600' },
           { label: 'Completion Rate', value: `${data?.kpis?.completionRate}%`, icon: Briefcase, color: 'bg-emerald-50 text-emerald-600' },
+          { label: 'Booking Conversion', value: `${data?.kpis?.bookingConversionRate ?? 0}%`, icon: TrendingUp, color: 'bg-brand-aqua/20 text-brand-aqua-deep' },
           { label: 'Avg. Rating', value: data?.kpis?.avgRating, icon: Star, color: 'bg-yellow-50 text-yellow-500' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="card card-body">
@@ -111,6 +119,8 @@ export default function AdminAnalyticsPage() {
                 ['Average Rating', data?.kpis?.avgRating],
                 ['Avg. Completion Time', `${data?.kpis?.avgCompletionHours}h`],
                 ['Booking Completion Rate', `${data?.kpis?.completionRate}%`],
+                ['Booking Conversion Rate', `${data?.kpis?.bookingConversionRate ?? 0}%`],
+                ['Provider Discovery Events', data?.kpis?.providerDiscoveryEvents],
                 ['New Users (Last 30 Days)', data?.kpis?.recentUsers],
               ].map(([label, val]) => (
                 <tr key={label} className="hover:bg-brand-cream-y">

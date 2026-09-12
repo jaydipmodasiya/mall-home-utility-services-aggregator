@@ -39,8 +39,13 @@ const bookingSchema = new mongoose.Schema(
       area: String,
       pincode: String,
       landmark: String,
+      locationType: {
+        type: String,
+        enum: ['residential', 'apartment', 'commercial', 'mall'],
+        default: 'residential',
+      },
     },
-    // Authoritative status set — 'accepted' removed; provider accepting = 'assigned'
+    // Authoritative status set; provider acceptance = 'assigned'.
     status: {
       type: String,
       enum: ['pending', 'assigned', 'in_progress', 'completed', 'cancelled', 'rejected'],

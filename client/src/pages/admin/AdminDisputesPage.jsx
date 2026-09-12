@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { DropdownSelect } from '../../components/ui/DropdownSelect'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { EmptyState, ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader, Spinner } from '../../components/ui/Spinner'
 import api from '../../services/api'
 import { formatDate } from '../../utils/constants'
@@ -24,16 +24,18 @@ export default function AdminDisputesPage() {
   const [resolution, setResolution] = useState('')
   const [newStatus, setNewStatus] = useState('resolved')
   const [actioning, setActioning] = useState(false)
+  const [error, setError] = useState(false)
 
   const fetchDisputes = async (status = statusFilter) => {
     setLoading(true)
+    setError(false)
     try {
       const params = new URLSearchParams({ limit: 50 })
       if (status) params.set('status', status)
       const { data } = await api.get(`/admin/disputes?${params}`)
       setDisputes(data.disputes || [])
       setTotal(data.total || 0)
-    } catch { } finally { setLoading(false) }
+    } catch { setError(true) } finally { setLoading(false) }
   }
 
   useEffect(() => { fetchDisputes() }, [])
@@ -69,7 +71,7 @@ export default function AdminDisputesPage() {
         ))}
       </div>
 
-      {loading ? <SectionLoader /> : disputes.length === 0 ? (
+      {loading ? <SectionLoader /> : error ? <ErrorState message="Couldn't load disputes. Please try again." onRetry={() => fetchDisputes()} /> : disputes.length === 0 ? (
         <EmptyState title="No disputes found" message="All clear! No disputes to review." icon={AlertTriangle} />
       ) : (
         <div className="space-y-3">

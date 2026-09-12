@@ -1,22 +1,29 @@
+import { AlertTriangle, Calendar, CheckCircle, ChevronRight, Shield, Star, TrendingUp, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DashboardLayout } from '../../components/layout/Layout'
+import { ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import api from '../../services/api'
-import { Users, Shield, Calendar, CheckCircle, AlertTriangle, Star, Clock, TrendingUp, ChevronRight } from 'lucide-react'
 
 export default function AdminDashboard() {
   const [kpis, setKpis] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  useEffect(() => {
+  const fetchAnalytics = () => {
+    setLoading(true)
+    setError(false)
     api.get('/admin/analytics')
       .then(({ data }) => setKpis(data.kpis))
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { fetchAnalytics() }, [])
 
   if (loading) return <DashboardLayout role="admin"><SectionLoader /></DashboardLayout>
+  if (error) return <DashboardLayout role="admin"><ErrorState message="Couldn't load the admin dashboard. Please try again." onRetry={fetchAnalytics} /></DashboardLayout>
 
   const kpiCards = [
     { label: 'Customers',         value: kpis?.totalUsers ?? 0,          icon: Users,        bg: 'bg-sky-50',     ic: 'text-sky-600',    sub: `+${kpis?.recentUsers ?? 0} this month` },

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { Avatar } from '../../components/ui/Avatar'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { EmptyState, ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader, Spinner } from '../../components/ui/Spinner'
 import api from '../../services/api'
 
@@ -25,16 +25,18 @@ export default function AdminProvidersPage() {
   const [selected, setSelected] = useState(null)
   const [note, setNote] = useState('')
   const [actioning, setActioning] = useState(false)
+  const [error, setError] = useState(false)
 
   const fetchProviders = async (status = statusFilter) => {
     setLoading(true)
+    setError(false)
     try {
       const params = new URLSearchParams({ limit: 50 })
       if (status) params.set('status', status)
       const { data } = await api.get(`/admin/providers?${params}`)
       setProviders(data.providers || [])
       setTotal(data.total || 0)
-    } catch { } finally { setLoading(false) }
+    } catch { setError(true) } finally { setLoading(false) }
   }
 
   useEffect(() => { fetchProviders() }, [])
@@ -86,7 +88,7 @@ export default function AdminProvidersPage() {
         ))}
       </div>
 
-      {loading ? <SectionLoader /> : providers.length === 0 ? (
+      {loading ? <SectionLoader /> : error ? <ErrorState message="Couldn't load providers. Please try again." onRetry={() => fetchProviders()} /> : providers.length === 0 ? (
         <EmptyState title="No providers found" icon={Shield} />
       ) : (
         <div className="space-y-3">

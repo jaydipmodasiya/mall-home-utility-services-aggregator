@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { Avatar } from '../../components/ui/Avatar'
+import { DropdownSelect } from '../../components/ui/DropdownSelect'
 import { ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader, Spinner } from '../../components/ui/Spinner'
 import { RatingDisplay } from '../../components/ui/StarRating'
@@ -23,7 +24,7 @@ export default function BookingFlowPage() {
     serviceDescription: '',
     bookingType: 'instant',
     scheduledAt: '',
-    serviceLocation: { address: '', city: '', area: '', pincode: '', landmark: '' },
+    serviceLocation: { address: '', city: '', area: '', pincode: '', landmark: '', locationType: 'residential' },
   })
   const [errors, setErrors] = useState({})
 
@@ -52,6 +53,7 @@ export default function BookingFlowPage() {
       const { data } = await api.post('/bookings', {
         providerId,
         ...form,
+        scheduledAt: form.bookingType === 'scheduled' ? new Date(form.scheduledAt).toISOString() : null,
         estimatedAmount: provider.pricing?.visitingCharge || 0,
       })
       toast.success('Booking request sent successfully!')
@@ -200,6 +202,17 @@ export default function BookingFlowPage() {
                 <input id="booking-area" type="text" className="form-input" placeholder="e.g. Andheri West" value={form.serviceLocation.area} onChange={(e) => setForm({ ...form, serviceLocation: { ...form.serviceLocation, area: e.target.value } })} />
               </div>
             </div>
+            <DropdownSelect
+              label="Location type"
+              value={form.serviceLocation.locationType}
+              onChange={(value) => setForm({ ...form, serviceLocation: { ...form.serviceLocation, locationType: value } })}
+              options={[
+                { value: 'residential', label: 'Residential' },
+                { value: 'apartment', label: 'Apartment' },
+                { value: 'commercial', label: 'Commercial' },
+                { value: 'mall', label: 'Mall' },
+              ]}
+            />
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="form-label" htmlFor="booking-pin">Pincode</label>

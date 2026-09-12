@@ -1,4 +1,4 @@
-import { MapPin, X } from 'lucide-react'
+import { LocateFixed, MapPin, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PublicLayout } from '../../components/layout/Layout'
@@ -17,6 +17,8 @@ export default function ProviderSearchPage() {
   const [page, setPage] = useState(1)
   const [pages, setPages] = useState(1)
   const [error, setError] = useState(false)
+  const [coordinates, setCoordinates] = useState(null)
+  const [locating, setLocating] = useState(false)
 
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
@@ -25,7 +27,7 @@ export default function ProviderSearchPage() {
     minRating: '',
   })
 
-  const fetchProviders = async (p = 1, f = filters) => {
+  const fetchProviders = async (p = 1, f = filters, location = coordinates) => {
     setLoading(true)
     setError(false)
     try {
@@ -34,6 +36,10 @@ export default function ProviderSearchPage() {
       if (f.city)      params.set('city', f.city)
       if (f.available) params.set('available', f.available)
       if (f.minRating) params.set('minRating', f.minRating)
+      if (location) {
+        params.set('latitude', location.latitude)
+        params.set('longitude', location.longitude)
+      }
       const { data } = await api.get(`/providers?${params}`)
       setProviders(data.providers || [])
       setTotal(data.total || 0)
@@ -43,7 +49,17 @@ export default function ProviderSearchPage() {
     finally { setLoading(false) }
   }
 
-  useEffect(() => { fetchProviders() }, [])
+  useEffect(() => {
+    const key = 'provider-discovery-session'
+    const sessionId = sessionStorage.getItem(key) || (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`)
+    sessionStorage.setItem(key, sessionId)
+    api.post('/discovery/provider-search', {
+      sessionId,
+      category: filters.category,
+      city: filters.city,
+    }).catch(() => {})
+    fetchProviders()
+  }, [])
 
   const applyFilters = (newFilters) => {
     setFilters(newFilters)
@@ -53,6 +69,23 @@ export default function ProviderSearchPage() {
   const clearFilter = (key) => {
     const nf = { ...filters, [key]: '' }
     applyFilters(nf)
+  }
+
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError(true)
+      return
+    }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setCoordinates({ latitude: coords.latitude, longitude: coords.longitude })
+        setLocating(false)
+        fetchProviders(1, filters, { latitude: coords.latitude, longitude: coords.longitude })
+      },
+      () => { setLocating(false); setError(true) },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+    )
   }
 
   const activeFilters = Object.entries(filters).filter(([, v]) => v)
@@ -82,6 +115,9 @@ export default function ProviderSearchPage() {
                   value={filters.city}
                   onChange={(e) => applyFilters({ ...filters, city: e.target.value })}
                 />
+                <button type="button" onClick={useCurrentLocation} disabled={locating} className="absolute right-2 top-[2.65rem] -translate-y-1/2 rounded-md p-1.5 text-brand-aqua-deep hover:bg-brand-aqua/10 disabled:opacity-50" aria-label="Use my current location" title="Use my current location">
+                  <LocateFixed className="h-4 w-4" />
+                </button>
               </div>
             </div>
 
