@@ -1,130 +1,52 @@
-import { Check, Link2, Radio, RotateCcw, Terminal } from 'lucide-react'
+import { ChevronRight, Circle, Hammer, Home, RotateCcw, Scissors, Star, Wrench } from 'lucide-react'
 import { useState } from 'react'
 
 const GAMES = [
-  { id: 'route', label: 'Route Repair' },
-  { id: 'bug', label: 'Debug the Bug' },
-  { id: 'nodes', label: 'Connect the Nodes' },
-  { id: 'signal', label: 'Fix the Signal' },
+  { id: 'catch', label: 'Catch' },
+  { id: 'match', label: 'Match' },
+  { id: 'sort', label: 'Sort' },
+  { id: 'path', label: 'Path' },
 ]
 
-const successMessage = 'Nice debugging! Route restored.'
-
-function RouteRepair({ onSuccess, onReset }) {
-  const [picked, setPicked] = useState(null)
-  const nodes = ['client', 'router', 'api', 'missing']
+function GameFrame({ title, instruction, reset, children }) {
   return (
-    <GameFrame title="repair the request path" reset={() => { setPicked(null); onReset() }}>
-      <div className="playground-route" role="group" aria-label="Route repair nodes">
-        {nodes.map((node, index) => (
-          <div key={node} className="playground-route-step">
-            <button type="button" className={`playground-node ${picked === node ? 'playground-node-selected' : ''} ${picked === 'missing' ? 'playground-node-fixed' : ''}`} onClick={() => { setPicked(node); if (node === 'missing') onSuccess() }} aria-label={`Inspect ${node} node`}>
-              {picked === 'missing' ? <Check className="h-4 w-4" /> : index + 1}
-            </button>
-            {index < nodes.length - 1 && <span className={`playground-link ${picked === 'missing' ? 'playground-link-fixed' : ''}`} aria-hidden="true" />}
-          </div>
-        ))}
-      </div>
-      <p className="playground-hint">{picked === 'missing' ? successMessage : picked ? 'That node is healthy. Trace the path again.' : 'Select the broken node to reconnect the path.'}</p>
-    </GameFrame>
-  )
-}
-
-function DebugTheBug({ onSuccess, onReset }) {
-  const [picked, setPicked] = useState(null)
-  const snippets = [
-    ['const route = "/services"', 'return route'],
-    ['const retry = true', 'fetchProviders()'],
-    ['const path = undefined', 'navigate(path)'],
-  ]
-  return (
-    <GameFrame title="inspect the suspicious snippet" reset={() => { setPicked(null); onReset() }}>
-      <div className="playground-snippets">
-        {snippets.map(([lineOne, lineTwo], index) => (
-          <button type="button" key={lineOne} className={`playground-snippet ${picked === index ? 'playground-snippet-picked' : ''}`} onClick={() => { setPicked(index); if (index === 2) onSuccess() }} aria-label={`Inspect code snippet ${index + 1}`}>
-            <span className="text-brand-aqua">0{index + 1}</span><code>{lineOne}<br />{lineTwo}</code>
-          </button>
-        ))}
-      </div>
-      <p className="playground-hint">{picked === 2 ? successMessage : picked !== null ? 'No issue here. Keep scanning.' : 'One snippet tries to navigate without a route.'}</p>
-    </GameFrame>
-  )
-}
-
-function ConnectTheNodes({ onSuccess, onReset }) {
-  const [sequence, setSequence] = useState([])
-  const next = sequence.length + 1
-  return (
-    <GameFrame title="connect nodes in sequence" reset={() => { setSequence([]); onReset() }}>
-      <div className="playground-node-grid" role="group" aria-label="Nodes to connect">
-        {[1, 2, 3, 4].map((node) => (
-          <button type="button" key={node} className={`playground-connect-node ${sequence.includes(node) ? 'playground-node-fixed' : ''}`} onClick={() => { if (node === next) { const updated = [...sequence, node]; setSequence(updated); if (updated.length === 4) onSuccess() } }} aria-label={`Connect node ${node}`}>
-            {sequence.includes(node) ? <Check className="h-4 w-4" /> : node}
-          </button>
-        ))}
-      </div>
-      <p className="playground-hint">{sequence.length === 4 ? successMessage : `Connect node ${next} next.`}</p>
-    </GameFrame>
-  )
-}
-
-function FixTheSignal({ onSuccess, onReset }) {
-  const [picked, setPicked] = useState(null)
-  return (
-    <GameFrame title="restore the signal bridge" reset={() => { setPicked(null); onReset() }}>
-      <div className="playground-signal" role="group" aria-label="Signal connections">
-        <Radio className={`h-6 w-6 ${picked === 'green' ? 'text-brand-mint' : 'text-brand-aqua'}`} aria-hidden="true" />
-        <span className={`playground-signal-line ${picked === 'green' ? 'playground-signal-live' : ''}`} aria-hidden="true" />
-        <div className="flex gap-2">
-          {['amber', 'green', 'coral'].map((signal) => (
-            <button type="button" key={signal} className={`playground-signal-button signal-${signal} ${picked === signal ? 'playground-signal-selected' : ''}`} onClick={() => { setPicked(signal); if (signal === 'green') onSuccess() }} aria-label={`Try ${signal} signal`} />
-          ))}
-        </div>
-      </div>
-      <p className="playground-hint">{picked === 'green' ? successMessage : 'Toggle the signal that can carry the request.'}</p>
-    </GameFrame>
-  )
-}
-
-function GameFrame({ title, reset, children }) {
-  return (
-    <div className="developer-game-panel">
-      <div className="mb-4 flex items-center justify-between gap-3 font-mono text-xs text-brand-aqua/80">
-        <span className="flex min-w-0 items-center gap-2 truncate"><Terminal className="h-3.5 w-3.5 flex-shrink-0" /> {title}</span>
-        <button type="button" onClick={reset} className="playground-reset" aria-label="Reset mini-game"><RotateCcw className="h-3.5 w-3.5" /></button>
+    <div className="simple-game-panel">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="min-w-0"><h3 className="truncate text-sm font-semibold text-white">{title}</h3><p className="mt-1 text-xs text-text-onDark/60">{instruction}</p></div>
+        <button type="button" onClick={reset} className="simple-game-reset" aria-label="Play again"><RotateCcw className="h-3.5 w-3.5" /></button>
       </div>
       {children}
     </div>
   )
 }
 
-export default function DeveloperPlayground() {
-  const [activeGame, setActiveGame] = useState('route')
-  const [success, setSuccess] = useState(false)
-  const selectGame = (game) => { setActiveGame(game); setSuccess(false) }
-  const gameProps = { onSuccess: () => setSuccess(true), onReset: () => setSuccess(false) }
+function CatchGame({ onSuccess }) {
+  const [caught, setCaught] = useState(null)
+  return <GameFrame title="Catch the Star" instruction="Tap the bright star." reset={() => setCaught(null)}><div className="catch-board" role="group" aria-label="Stars to catch">{[0, 1, 2, 3].map((star) => <button type="button" key={star} className={`catch-star catch-star-${star} ${caught === star ? 'catch-star-caught' : ''}`} onClick={() => { setCaught(star); if (star === 2) onSuccess('Nice catch! ⭐') }} aria-label={`Star ${star + 1}`}><Star className="h-5 w-5" fill="currentColor" /></button>)}</div><p className="simple-game-feedback">{caught === 2 ? 'Nice catch! ⭐' : 'One star is shining brighter than the others.'}</p></GameFrame>
+}
 
-  return (
-    <section className="developer-playground" aria-labelledby="playground-title">
-      <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-aqua">Developer Playground</p>
-          <h2 id="playground-title" className="mt-1 text-lg font-display font-bold text-white">Fix the route, if you feel like it.</h2>
-        </div>
-        <Link2 className="hidden h-5 w-5 text-brand-aqua/60 sm:block" aria-hidden="true" />
-      </div>
-      <div className="playground-tabs" role="tablist" aria-label="Developer mini-games">
-        {GAMES.map((game) => (
-          <button type="button" key={game.id} role="tab" aria-selected={activeGame === game.id} className={`playground-tab ${activeGame === game.id ? 'playground-tab-active' : ''}`} onClick={() => selectGame(game.id)}>{game.label}</button>
-        ))}
-      </div>
-      <div className="mt-4">
-        {activeGame === 'route' && <RouteRepair {...gameProps} />}
-        {activeGame === 'bug' && <DebugTheBug {...gameProps} />}
-        {activeGame === 'nodes' && <ConnectTheNodes {...gameProps} />}
-        {activeGame === 'signal' && <FixTheSignal {...gameProps} />}
-      </div>
-      <p className={`mt-3 min-h-5 text-center font-mono text-xs ${success ? 'text-brand-mint' : 'text-transparent'}`} aria-live="polite">{success ? 'Route fixed. Nice debugging! 🚀' : ' '}</p>
-    </section>
-  )
+function MatchGame({ onSuccess }) {
+  const cards = ['★', '★', '●', '●']
+  const [open, setOpen] = useState([])
+  const choose = (index) => { if (open.includes(index) || open.length === 2) return; const next = [...open, index]; setOpen(next); if (next.length === 2 && cards[next[0]] === cards[next[1]]) onSuccess('Perfect match! 🎉'); if (next.length === 2 && cards[next[0]] !== cards[next[1]]) setTimeout(() => setOpen([]), 450) }
+  return <GameFrame title="Match the Pairs" instruction="Find two cards that match." reset={() => setOpen([])}><div className="match-board" role="group" aria-label="Matching cards">{cards.map((card, index) => <button type="button" key={index} className={`match-card ${open.includes(index) ? 'match-card-open' : ''}`} onClick={() => choose(index)} aria-label={`Card ${index + 1}`}>{open.includes(index) ? card : '?'}</button>)}</div><p className="simple-game-feedback">{open.length === 2 && cards[open[0]] === cards[open[1]] ? 'Perfect match! 🎉' : 'Two pairs are waiting.'}</p></GameFrame>
+}
+
+function SortGame({ onSuccess }) {
+  const [sorted, setSorted] = useState([])
+  const tools = [{ id: 'wrench', label: 'Maintenance', Icon: Wrench }, { id: 'scissors', label: 'Tailor', Icon: Scissors }, { id: 'hammer', label: 'Carpenter', Icon: Hammer }]
+  return <GameFrame title="Sort the Tools" instruction="Place each tool in its matching group." reset={() => setSorted([])}><div className="sort-board"><div className="sort-tools">{tools.map(({ id, Icon }) => <button type="button" key={id} className={`sort-tool ${sorted.includes(id) ? 'sort-tool-done' : ''}`} onClick={() => { if (!sorted.includes(id)) { const next = [...sorted, id]; setSorted(next); if (next.length === tools.length) onSuccess('All sorted! 🛠️') } }} aria-label={`Sort ${id}`}><Icon className="h-5 w-5" /></button>)}</div><div className="sort-labels">{tools.map(({ id, label }) => <span key={id} className={sorted.includes(id) ? 'sort-label-done' : ''}>{label}</span>)}</div></div><p className="simple-game-feedback">{sorted.length === tools.length ? 'All sorted! 🛠️' : 'Tap each tool to place it.'}</p></GameFrame>
+}
+
+function PathGame({ onSuccess }) {
+  const [path, setPath] = useState(null)
+  return <GameFrame title="Find the Right Path" instruction="Choose the path that reaches home." reset={() => setPath(null)}><div className="path-board" role="group" aria-label="Paths to home"><Circle className="h-5 w-5 text-brand-aqua" fill="currentColor" />{[0, 1, 2].map((option) => <button type="button" key={option} className={`path-choice path-choice-${option} ${path === option ? 'path-choice-selected' : ''}`} onClick={() => { setPath(option); if (option === 1) onSuccess('You found the way! 🏠') }} aria-label={`Choose path ${option + 1}`}><ChevronRight className="h-5 w-5" /></button>)}<Home className={`h-5 w-5 ${path === 1 ? 'text-brand-mint' : 'text-brand-peach'}`} fill="currentColor" /></div><p className="simple-game-feedback">{path === 1 ? 'You found the way! 🏠' : 'Only one path reaches home.'}</p></GameFrame>
+}
+
+export default function DeveloperPlayground() {
+  const [activeGame, setActiveGame] = useState('catch')
+  const [success, setSuccess] = useState('')
+  const selectGame = (game) => { setActiveGame(game); setSuccess('') }
+  const gameProps = { onSuccess: setSuccess }
+  return <section className="developer-playground" aria-labelledby="playground-title"><div className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-aqua">A little something extra</p><h2 id="playground-title" className="mt-1 text-lg font-display font-bold text-white">Play while you find your way.</h2></div><div className="playground-tabs" role="tablist" aria-label="Mini-games">{GAMES.map((game) => <button type="button" key={game.id} role="tab" aria-selected={activeGame === game.id} className={`playground-tab ${activeGame === game.id ? 'playground-tab-active' : ''}`} onClick={() => selectGame(game.id)}>{game.label}</button>)}</div><div className="mt-4">{activeGame === 'catch' && <CatchGame {...gameProps} />}{activeGame === 'match' && <MatchGame {...gameProps} />}{activeGame === 'sort' && <SortGame {...gameProps} />}{activeGame === 'path' && <PathGame {...gameProps} />}</div><p className={`mt-3 min-h-5 text-center text-xs ${success ? 'text-brand-mint' : 'text-transparent'}`} aria-live="polite">{success || ' '}</p></section>
 }

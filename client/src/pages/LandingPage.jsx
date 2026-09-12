@@ -166,7 +166,7 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════════
           01 · HERO
       ══════════════════════════════════════════════ */}
-      <section className="bg-white pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden">
+      <section className="bg-white pt-12 pb-16 md:pt-20 md:pb-24">
         <div className="page-container">
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
 
@@ -192,13 +192,13 @@ export default function LandingPage() {
               {/* Search module */}
               <form
                 onSubmit={handleSearch}
-                className="bg-white rounded-2xl border overflow-hidden mb-5"
+                className="relative z-30 bg-white rounded-2xl border mb-5"
                 style={{ borderColor: '#D4E8E8', boxShadow: '0 2px 16px rgba(15,43,61,0.07)' }}
               >
                 <div className="flex flex-col sm:flex-row">
                   {/* City */}
                   <label className="sr-only" htmlFor="hero-city">City</label>
-                  <div className="flex items-center gap-2.5 flex-1 px-4 py-3.5 border-b sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
+                  <div className="flex min-w-0 flex-1 items-center gap-2.5 border-b px-4 py-3.5 sm:border-b-0 sm:border-r" style={{ borderColor: '#E8F4F4' }}>
                     <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: '#ABDDDE' }} />
                     <input
                       id="hero-city"
@@ -220,7 +220,6 @@ export default function LandingPage() {
                       value={category}
                       onChange={setCategory}
                       placeholder="Select a service"
-                      label="Service"
                       options={services.map((s) => ({ value: s.key, label: s.label }))}
                     />
                   </div>

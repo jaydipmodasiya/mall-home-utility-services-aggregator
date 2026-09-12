@@ -153,7 +153,7 @@
   }
 
   .dropdown-menu {
-    @apply absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 max-h-64 overflow-y-auto rounded-lg
+    @apply absolute left-0 right-0 top-[calc(100%+0.35rem)] z-[100] max-h-64 overflow-y-auto rounded-lg
            border border-brand-peach-warm bg-white p-1.5 shadow-modal;
   }
 
@@ -206,6 +206,32 @@
   .signal-green { @apply bg-brand-mint; }
   .signal-coral { @apply bg-brand-coral; }
   .playground-signal-selected { @apply border-white; }
+
+  .simple-game-panel { @apply min-w-0 rounded-xl border border-white/10 bg-brand-navy-light/60 p-4; }
+  .simple-game-reset { @apply rounded-md p-2 text-brand-aqua/70 transition-colors hover:bg-white/10 hover:text-brand-aqua focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .simple-game-feedback { @apply mt-4 min-h-5 text-xs leading-5 text-brand-aqua/80; }
+  .catch-board { @apply relative h-28 overflow-hidden rounded-lg border border-white/10 bg-brand-navy; }
+  .catch-star { @apply absolute rounded-full p-2 text-brand-peach transition-transform hover:scale-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .catch-star-0 { left: 12%; top: 24%; }
+  .catch-star-1 { left: 70%; top: 60%; color: #CAF1DE; }
+  .catch-star-2 { left: 44%; top: 35%; color: #FEF9DC; }
+  .catch-star-3 { left: 82%; top: 14%; color: #F7D8BB; }
+  .catch-star-caught { @apply scale-125 text-white; }
+  .match-board { @apply grid grid-cols-4 gap-3; }
+  .match-card { @apply flex h-16 items-center justify-center rounded-lg border border-brand-aqua/40 bg-brand-aqua/10 text-xl font-bold text-brand-aqua transition-all hover:bg-brand-aqua/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .match-card-open { @apply border-brand-mint bg-brand-mint/20 text-brand-mint; }
+  .sort-board { @apply space-y-3; }
+  .sort-tools { @apply flex justify-around rounded-lg border border-white/10 bg-brand-navy p-3; }
+  .sort-tool { @apply rounded-lg bg-brand-aqua/15 p-3 text-brand-aqua transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .sort-tool-done { @apply bg-brand-mint text-brand-navy; }
+  .sort-labels { @apply grid grid-cols-3 gap-2 text-center text-[10px] text-text-onDark/60; }
+  .sort-label-done { @apply text-brand-mint; }
+  .path-board { @apply flex items-center gap-2 rounded-lg border border-white/10 bg-brand-navy p-4; }
+  .path-choice { @apply flex min-w-0 flex-1 items-center justify-center rounded-md border border-brand-aqua/40 py-3 text-brand-aqua transition-colors hover:bg-brand-aqua/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua; }
+  .path-choice-0 { transform: translateY(-7px); }
+  .path-choice-1 { transform: translateY(7px); }
+  .path-choice-2 { transform: translateY(-7px); }
+  .path-choice-selected { @apply border-brand-mint bg-brand-mint/20 text-brand-mint; }
 
   @media (prefers-reduced-motion: no-preference) {
     .playground-link-fixed { animation: route-connect 500ms ease-out; }
