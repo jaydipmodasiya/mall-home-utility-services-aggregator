@@ -98,14 +98,6 @@ exports.getDispute = async (req, res, next) => {
 
     if (!dispute) return res.status(404).json({ success: false, message: 'Dispute not found' });
 
-    await createNotification({
-      userId: dispute.raisedBy,
-      type: 'dispute_updated',
-      title: 'Dispute updated',
-      message: `Your dispute is now ${status.replace('_', ' ')}.`,
-      metadata: { disputeId: dispute._id, status },
-    });
-
     // Participants in the booking and admins can view the dispute.
     const isRaiser = dispute.raisedBy._id.toString() === req.user._id.toString();
     const isAdmin = req.user.role === 'admin';
@@ -178,6 +170,14 @@ exports.adminUpdateDispute = async (req, res, next) => {
     ).populate('raisedBy', 'name email');
 
     if (!dispute) return res.status(404).json({ success: false, message: 'Dispute not found' });
+
+    await createNotification({
+      userId: dispute.raisedBy,
+      type: 'dispute_updated',
+      title: 'Dispute updated',
+      message: `Your dispute is now ${status.replace('_', ' ')}.`,
+      metadata: { disputeId: dispute._id, status },
+    });
 
     res.json({ success: true, dispute });
   } catch (error) {

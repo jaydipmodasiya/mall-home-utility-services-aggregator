@@ -21,6 +21,11 @@ const errorHandler = (err, req, res, next) => {
     statusCode = 400;
   }
 
+  if (err.name === 'MulterError' || err.message === 'Only JPEG, PNG and PDF files are allowed') {
+    statusCode = 400;
+    message = err.code === 'LIMIT_FILE_SIZE' ? 'File must be 5MB or smaller' : err.message;
+  }
+
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
     message = 'Invalid token';

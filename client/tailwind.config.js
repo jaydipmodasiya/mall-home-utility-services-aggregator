@@ -17,9 +17,9 @@ export default {
           'cream-y': '#FEF9DC',   // highlight accent bg
           peach: '#FFE7C8',   // soft accent
           'peach-warm': '#F7D8BB',   // borders / dividers
-          coral: '#E8704A',   // primary CTA
-          'coral-dark': '#C85A37',   // coral hover
-          'coral-pale': '#FBF0EC',   // coral light bg
+          coral: '#FEF9DC',   // cream yellow accent
+          'coral-dark': '#F7D8BB',   // warm peach accent
+          'coral-pale': '#FEF9DC',   // cream yellow light bg
           navy: '#0F2B3D',   // nav / footer / headings
           'navy-mid': '#1B4060',   // mid navy for text
           'navy-light': '#2A5F7F',   // lighter nav accent
@@ -64,7 +64,7 @@ export default {
         'card': '0 1px 4px rgba(15, 43, 61, 0.07)',
         'card-hover': '0 4px 20px rgba(15, 43, 61, 0.12)',
         'nav': '0 1px 0 rgba(15, 43, 61, 0.08)',
-        'btn': '0 2px 6px rgba(232, 112, 74, 0.30)',
+        'btn': '0 2px 6px rgba(26, 124, 128, 0.24)',
         'modal': '0 16px 48px rgba(15, 43, 61, 0.18)',
       },
       animation: {

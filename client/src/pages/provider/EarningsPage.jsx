@@ -35,8 +35,8 @@ export default function EarningsPage() {
         {[
           { label: 'Total Earnings', value: formatCurrency(profile?.totalEarnings || 0), icon: DollarSign, color: 'bg-emerald-50 text-emerald-600' },
           { label: 'This Month', value: formatCurrency(thisMonthEarnings), icon: TrendingUp, color: 'bg-blue-50 text-blue-600' },
-          { label: 'Completed Jobs', value: profile?.completedJobs || 0, icon: Briefcase, color: 'bg-violet-50 text-violet-600' },
-          { label: 'This Month Jobs', value: thisMonth.length, icon: Calendar, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Completed Jobs', value: profile?.completedJobs || 0, icon: Briefcase, color: 'bg-brand-mint text-text-primary' },
+          { label: 'This Month Jobs', value: thisMonth.length, icon: Calendar, color: 'bg-brand-cream-y text-text-primary' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="card card-body">
             <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-3`}>

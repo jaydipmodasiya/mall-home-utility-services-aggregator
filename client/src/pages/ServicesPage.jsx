@@ -1,35 +1,35 @@
+import { ArrowRight, CheckCircle, ChevronRight, Droplets, Hammer, Scissors, Wrench, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PublicLayout } from '../components/layout/Layout'
-import { Zap, Droplets, Hammer, Scissors, Wrench, CheckCircle, ChevronRight, ArrowRight } from 'lucide-react'
 
 const services = [
   {
     icon: Zap, label: 'Electrician', cat: 'electrician',
-    bg: 'bg-amber-50', ic: 'text-amber-600', border: 'hover:border-amber-300',
+    bg: 'bg-brand-cream-y', ic: 'text-text-primary', border: 'hover:border-brand-aqua',
     desc: 'Licensed electricians for all residential and commercial electrical needs.',
     tasks: ['Fan & Light Installation', 'Socket & Switch Repair', 'MCB / Circuit Breaker', 'Inverter & Battery Setup', 'Full Wiring Work', 'Meter Related Work'],
   },
   {
     icon: Droplets, label: 'Plumber', cat: 'plumber',
-    bg: 'bg-sky-50', ic: 'text-sky-600', border: 'hover:border-sky-300',
+    bg: 'bg-brand-aqua/20', ic: 'text-brand-aqua-deep', border: 'hover:border-brand-aqua',
     desc: 'Expert plumbing solutions for homes, apartments and commercial spaces.',
     tasks: ['Tap Repair & Replacement', 'Pipe Leak Detection & Fix', 'Drainage Cleaning', 'Water Heater Installation', 'RO System Setup', 'Bathroom Fitting'],
   },
   {
     icon: Hammer, label: 'Carpenter', cat: 'carpenter',
-    bg: 'bg-orange-50', ic: 'text-orange-600', border: 'hover:border-orange-300',
+    bg: 'bg-brand-peach', ic: 'text-text-primary', border: 'hover:border-brand-peach-warm',
     desc: 'Skilled carpenters for furniture, doors and all custom woodwork.',
     tasks: ['Furniture Repair & Assembly', 'Door & Window Fixing', 'Custom Shelves & Cabinets', 'Wood Polish & Finishing', 'Partition Work', 'False Ceiling (Wood)'],
   },
   {
     icon: Scissors, label: 'Tailor', cat: 'tailor',
-    bg: 'bg-pink-50', ic: 'text-pink-600', border: 'hover:border-pink-300',
+    bg: 'bg-brand-pale', ic: 'text-text-primary', border: 'hover:border-brand-aqua',
     desc: 'Professional tailors for stitching, alterations and home textile work.',
     tasks: ['Blouse & Dress Stitching', 'Uniform Repair & Alteration', 'Curtain & Drape Making', 'Kids & School Wear', 'Hem & Length Shortening', 'Embroidery Work'],
   },
   {
     icon: Wrench, label: 'Maintenance Staff', cat: 'maintenance',
-    bg: 'bg-teal-50', ic: 'text-teal-600', border: 'hover:border-teal-300',
+    bg: 'bg-brand-mint', ic: 'text-text-primary', border: 'hover:border-brand-aqua',
     desc: 'General maintenance experts for malls, offices and residential complexes.',
     tasks: ['Deep Cleaning Services', 'Painting & Touch-ups', 'AC Servicing & Cleaning', 'Handyman & Minor Repairs', 'Pest Control Preparation', 'Floor Maintenance'],
   },
@@ -78,7 +78,7 @@ export default function ServicesPage() {
                   </div>
                   <Link
                     to={`/providers?category=${cat}`}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-brand-coral hover:text-brand-coral-dark transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-brand-aqua-deep hover:text-brand-navy transition-colors"
                   >
                     Find {label} <ChevronRight className="w-4 h-4" />
                   </Link>

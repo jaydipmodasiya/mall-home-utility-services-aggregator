@@ -115,7 +115,7 @@ export default function JobDetailPage() {
             {booking.scheduledAt && (
               <div>
                 <p className="text-xs text-text-muted mb-1">Scheduled For</p>
-                <p className="font-semibold text-brand-coral-dark">{formatDateTime(booking.scheduledAt)}</p>
+                <p className="font-semibold text-brand-aqua-deep">{formatDateTime(booking.scheduledAt)}</p>
               </div>
             )}
             <div>

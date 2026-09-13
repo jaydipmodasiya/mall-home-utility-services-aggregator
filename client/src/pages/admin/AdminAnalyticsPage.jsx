@@ -6,7 +6,7 @@ import { ErrorState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import api from '../../services/api'
 
-const COLORS = ['#F5A623', '#FFC94A', '#D4891A', '#8B6332', '#5C3D11']
+const COLORS = ['#ABDDDE', '#CAF1DE', '#E1F8DC', '#FEF9DC', '#FFE7C8']
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export default function AdminAnalyticsPage() {
@@ -48,11 +48,11 @@ export default function AdminAnalyticsPage() {
       {/* KPI summary row */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {[
-          { label: 'Total Customers', value: data?.kpis?.totalUsers, icon: Users, color: 'bg-blue-50 text-blue-600' },
-          { label: 'Verified Providers', value: data?.kpis?.verifiedProviders, icon: TrendingUp, color: 'bg-violet-50 text-violet-600' },
+          { label: 'Total Customers', value: data?.kpis?.totalUsers, icon: Users, color: 'bg-brand-aqua/20 text-brand-aqua-deep' },
+          { label: 'Verified Providers', value: data?.kpis?.verifiedProviders, icon: TrendingUp, color: 'bg-brand-mint text-text-primary' },
           { label: 'Completion Rate', value: `${data?.kpis?.completionRate}%`, icon: Briefcase, color: 'bg-emerald-50 text-emerald-600' },
           { label: 'Booking Conversion', value: `${data?.kpis?.bookingConversionRate ?? 0}%`, icon: TrendingUp, color: 'bg-brand-aqua/20 text-brand-aqua-deep' },
-          { label: 'Avg. Rating', value: data?.kpis?.avgRating, icon: Star, color: 'bg-yellow-50 text-yellow-500' },
+          { label: 'Avg. Rating', value: data?.kpis?.avgRating, icon: Star, color: 'bg-brand-cream-y text-brand-aqua-deep' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="card card-body">
             <div className={`w-9 h-9 rounded-xl ${color} flex items-center justify-center mb-3`}><Icon className="w-4 h-4" /></div>
@@ -71,10 +71,10 @@ export default function AdminAnalyticsPage() {
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={monthlyData} barSize={28}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9B8B70' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9B8B70' }} />
-                <Tooltip contentStyle={{ background: '#FDFAF4', border: '1px solid #F5ECD7', borderRadius: 12, fontSize: 12 }} />
-                <Bar dataKey="bookings" fill="#F5A623" radius={[6, 6, 0, 0]} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B8EA0' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B8EA0' }} />
+                <Tooltip contentStyle={{ background: '#E1F8DC', border: '1px solid #F7D8BB', borderRadius: 12, fontSize: 12 }} />
+                <Bar dataKey="bookings" fill="#ABDDDE" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -91,7 +91,7 @@ export default function AdminAnalyticsPage() {
                 <Pie data={categoryData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false} fontSize={11}>
                   {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: '#FDFAF4', border: '1px solid #F5ECD7', borderRadius: 12, fontSize: 12 }} />
+                <Tooltip contentStyle={{ background: '#E1F8DC', border: '1px solid #F7D8BB', borderRadius: 12, fontSize: 12 }} />
               </PieChart>
             </ResponsiveContainer>
           )}

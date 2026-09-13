@@ -1,12 +1,12 @@
+import { AlertCircle, ArrowRight, Bell, Briefcase, CheckCircle, ChevronRight, Clock, DollarSign } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import { DashboardLayout } from '../../components/layout/Layout'
 import { SectionLoader } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/ui/StatusBadge'
+import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
-import { formatCurrency, formatDate } from '../../utils/constants'
-import { Briefcase, DollarSign, Star, Clock, ChevronRight, AlertCircle, CheckCircle, ArrowRight, Bell } from 'lucide-react'
+import { formatCurrency } from '../../utils/constants'
 
 export default function ProviderDashboard() {
   const { user } = useAuth()
@@ -98,7 +98,7 @@ export default function ProviderDashboard() {
           { label: 'Total Earnings', value: formatCurrency(profile?.totalEarnings || 0), sub: 'Lifetime', color: 'text-emerald-600' },
           { label: 'Completed Jobs', value: profile?.completedJobs || 0, sub: 'All time', color: 'text-text-primary' },
           { label: 'Active Jobs', value: activeJobs.length, sub: 'Right now', color: 'text-brand-aqua-deep' },
-          { label: 'Rating', value: profile?.rating ? `${Number(profile.rating).toFixed(1)}` : '—', sub: `${profile?.totalReviews || 0} reviews`, color: 'text-amber-600' },
+          { label: 'Rating', value: profile?.rating ? `${Number(profile.rating).toFixed(1)}` : '—', sub: `${profile?.totalReviews || 0} reviews`, color: 'text-brand-aqua-deep' },
         ].map(({ label, value, sub, color }) => (
           <div key={label} className="bg-white rounded-xl border border-brand-peach-warm/60 p-4">
             <p className={`text-2xl font-display font-bold ${color}`}>{value}</p>
@@ -129,7 +129,7 @@ export default function ProviderDashboard() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-text-primary">Recent Jobs</h2>
-          <Link to="/provider/jobs" className="text-xs font-semibold text-brand-coral hover:text-brand-coral-dark flex items-center gap-1">
+          <Link to="/provider/jobs" className="text-xs font-semibold text-brand-aqua-deep hover:text-brand-navy flex items-center gap-1">
             All jobs <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>

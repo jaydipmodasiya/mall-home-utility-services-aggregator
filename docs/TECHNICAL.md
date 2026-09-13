@@ -14,8 +14,6 @@
                      │ /api/*
 ┌────────────────────▼────────────────────────────────┐
 │               SERVER (Node.js + Express)             │
-  status: String,          // pending|assigned|in_progress|completed|cancelled|rejected
-  locationType: String,    // optional: residential | apartment | commercial | mall
 └────────────────────┬────────────────────────────────┘
                      │ Mongoose ODM
 ┌────────────────────▼────────────────────────────────┐
@@ -82,6 +80,7 @@
 ```js
 {
   customerId: ObjectId,    // ref: User
+  sessionId: String,        // optional provider-discovery session
   providerId: ObjectId,    // ref: ServiceProvider
   serviceCategory: String,
   serviceDescription: String,
@@ -260,7 +259,6 @@ Custom Classes:
 | Password hashing | bcrypt with 12 salt rounds |
 | JWT | Signed with env secret, 7d expiry |
 | Route protection | Role-based middleware on every route |
-| Route protection | Role-based middleware on every route |
 | Input validation | express-validator + controller-level checks |
 | Error sanitization | No stack traces in production |
 | CORS | Only allows configured CLIENT_URL |
@@ -277,7 +275,7 @@ Authenticated users can read and mark notifications through `GET /api/notificati
 
 Provider discovery supports optional browser geolocation coordinates. `GET /api/providers` accepts `latitude`, `longitude`, and `radiusKm` and uses the provider 2dsphere index for nearby results; no paid map SDK or hardcoded map key is used.
 
-Admin `bookingConversionRate` is calculated as booking records divided by recorded provider-discovery events, expressed as a percentage. `providerDiscoveryEvents` is exposed alongside the KPI so the denominator is visible and a zero-event period reports 0 rather than an invented rate.
+Admin `bookingConversionRate` is calculated as unique discovery sessions that produced a booking divided by unique discovery sessions, expressed as a percentage. `providerDiscoveryEvents` is exposed alongside the KPI, and a zero-session period reports 0 rather than an invented rate.
 
 ---
 

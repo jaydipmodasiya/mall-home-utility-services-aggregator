@@ -65,7 +65,7 @@ export default function AdminCategoriesPage() {
               <p className="text-sm text-text-muted mb-3">{cat.description}</p>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-text-muted">Base price</span>
-                <span className="font-bold text-brand-coral-dark">{formatCurrency(cat.basePrice)}</span>
+                <span className="font-bold text-brand-aqua-deep">{formatCurrency(cat.basePrice)}</span>
               </div>
               {cat.pricingGuideline && <p className="text-xs text-text-muted mt-2 italic">{cat.pricingGuideline}</p>}
             </div>

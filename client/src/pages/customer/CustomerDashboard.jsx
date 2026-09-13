@@ -1,13 +1,13 @@
+import { Calendar, ChevronRight, Droplets, Hammer, Scissors, Wrench, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import { DashboardLayout } from '../../components/layout/Layout'
+import { EmptyState } from '../../components/ui/EmptyState'
 import { SectionLoader } from '../../components/ui/Spinner'
 import { StatusBadge } from '../../components/ui/StatusBadge'
-import { EmptyState } from '../../components/ui/EmptyState'
+import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
-import { formatDate, formatCurrency, CATEGORIES } from '../../utils/constants'
-import { Calendar, Clock, ChevronRight, Star, Zap, Droplets, Hammer, Scissors, Wrench, ArrowRight, PlusCircle } from 'lucide-react'
+import { CATEGORIES, formatDate } from '../../utils/constants'
 
 const iconMap = { Zap, Droplets, Hammer, Scissors, Wrench }
 
@@ -77,7 +77,7 @@ export default function CustomerDashboard() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-text-primary">Book a service</h2>
-          <Link to="/providers" className="text-xs font-semibold text-brand-coral hover:text-brand-coral-dark flex items-center gap-1">
+          <Link to="/providers" className="text-xs font-semibold text-brand-aqua-deep hover:text-brand-navy flex items-center gap-1">
             All services <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -104,7 +104,7 @@ export default function CustomerDashboard() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-text-primary">Recent bookings</h2>
-          <Link to="/customer/bookings" className="text-xs font-semibold text-brand-coral hover:text-brand-coral-dark flex items-center gap-1">
+          <Link to="/customer/bookings" className="text-xs font-semibold text-brand-aqua-deep hover:text-brand-navy flex items-center gap-1">
             View all <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>

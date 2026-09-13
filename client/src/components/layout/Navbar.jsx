@@ -85,8 +85,8 @@ export default function Navbar({ variant = 'dark' }) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isLight ? 'bg-amber-100' : 'bg-brand-aqua'}`}>
-              <Zap className={`w-4 h-4 ${isLight ? 'text-amber-600' : 'text-brand-navy'}`} fill="currentColor" />
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isLight ? 'bg-brand-mint' : 'bg-brand-aqua'}`}>
+              <Zap className={`w-4 h-4 ${isLight ? 'text-brand-aqua-deep' : 'text-brand-navy'}`} fill="currentColor" />
             </div>
             <span className={`text-base font-display font-bold tracking-tight leading-tight ${isLight ? 'text-text-primary' : 'text-white'}`}>
               Mall &amp; Home
@@ -138,7 +138,7 @@ export default function Navbar({ variant = 'dark' }) {
                 <div className="relative" ref={notificationRef}>
                   <button type="button" onClick={() => setNotificationOpen((open) => !open)} className={`relative rounded-lg p-2 transition-colors ${isLight ? 'text-text-muted hover:bg-gray-100' : 'text-text-onDark/70 hover:bg-white/10'}`} aria-label="Notifications" aria-expanded={notificationOpen}>
                     <Bell className="h-4 w-4" />
-                    {unread > 0 && <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-brand-coral px-1 text-center text-[10px] font-bold text-white">{unread > 9 ? '9+' : unread}</span>}
+                    {unread > 0 && <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-brand-aqua-deep px-1 text-center text-[10px] font-bold text-white">{unread > 9 ? '9+' : unread}</span>}
                   </button>
                   {notificationOpen && <div className="absolute right-0 top-11 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-brand-peach-warm/60 bg-white p-3 shadow-modal">
                     <div className="flex items-center justify-between border-b border-brand-peach-warm/40 px-2 pb-2"><p className="text-sm font-bold text-text-primary">Notifications</p><button type="button" onClick={markAllNotificationsRead} disabled={!unread} className="flex items-center gap-1 text-xs font-semibold text-brand-aqua-deep disabled:cursor-not-allowed disabled:opacity-40"><CheckCheck className="h-3.5 w-3.5" /> Mark all as read</button></div>

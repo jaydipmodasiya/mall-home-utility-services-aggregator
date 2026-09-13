@@ -1,4 +1,4 @@
-import { Search, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { Search, UserCheck, Users, UserX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { DashboardLayout } from '../../components/layout/Layout'
@@ -34,22 +34,13 @@ export default function AdminUsersPage() {
   useEffect(() => { fetchUsers() }, [])
 
   const toggleActive = async (u) => {
+    if (u.isActive && !window.confirm(`Deactivate ${u.name}? Their account and related history will be preserved.`)) return
     setActionId(u._id)
     try {
       await api.patch(`/admin/users/${u._id}`, { isActive: !u.isActive })
       toast.success(`User ${u.isActive ? 'deactivated' : 'activated'}`)
       fetchUsers()
     } catch { toast.error('Action failed') } finally { setActionId(null) }
-  }
-
-  const deleteUser = async (u) => {
-    if (!window.confirm(`Delete ${u.name}? This cannot be undone.`)) return
-    setActionId(u._id)
-    try {
-      await api.delete(`/admin/users/${u._id}`)
-      toast.success('User deleted')
-      fetchUsers()
-    } catch { toast.error('Delete failed') } finally { setActionId(null) }
   }
 
   return (
@@ -107,9 +98,6 @@ export default function AdminUsersPage() {
                       <div className="flex items-center gap-2">
                         <button onClick={() => toggleActive(u)} disabled={actionId === u._id || u.role === 'admin'} className="p-1.5 rounded-lg hover:bg-brand-peach-warm transition-colors disabled:opacity-40" title={u.isActive ? 'Deactivate' : 'Activate'}>
                           {u.isActive ? <UserX className="w-4 h-4 text-red-400" /> : <UserCheck className="w-4 h-4 text-emerald-500" />}
-                        </button>
-                        <button onClick={() => deleteUser(u)} disabled={actionId === u._id || u.role === 'admin'} className="p-1.5 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40" title="Delete user">
-                          <Trash2 className="w-4 h-4 text-red-400" />
                         </button>
                       </div>
                     </td>

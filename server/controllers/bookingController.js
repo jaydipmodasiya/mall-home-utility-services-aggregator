@@ -2,6 +2,8 @@ const Booking = require('../models/Booking');
 const ServiceProvider = require('../models/ServiceProvider');
 const { createNotification } = require('../utils/notify');
 
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /* ─────────────────────────────────────────────────────
    Valid status transitions (server-authoritative)
   Provider acceptance is represented by the 'assigned' state.
@@ -381,7 +383,7 @@ exports.adminGetBookings = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid service category' });
     }
     if (category) filter.serviceCategory = category;
-    if (city) filter['serviceLocation.city'] = { $regex: city, $options: 'i' };
+    if (city) filter['serviceLocation.city'] = { $regex: escapeRegex(city.slice(0, 100)), $options: 'i' };
 
     const pageNum = Math.max(1, parseInt(page) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 20));

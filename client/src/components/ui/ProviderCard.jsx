@@ -1,7 +1,7 @@
+import { Briefcase, CheckCircle, ChevronRight, Clock, MapPin, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Avatar } from './Avatar'
-import { MapPin, Clock, Briefcase, ChevronRight, CheckCircle, Star } from 'lucide-react'
 import { formatCurrency } from '../../utils/constants'
+import { Avatar } from './Avatar'
 
 export default function ProviderCard({ provider }) {
   const user = provider.userId || {}
@@ -31,7 +31,7 @@ export default function ProviderCard({ provider }) {
             </div>
             <div className="flex items-center gap-1 mt-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className={`w-3 h-3 ${i < ratingInt ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'}`} />
+                <Star key={i} className={`w-3 h-3 ${i < ratingInt ? 'text-brand-aqua-deep fill-brand-cream-y' : 'text-gray-200 fill-gray-200'}`} />
               ))}
               <span className="text-xs text-text-muted ml-1">({provider.totalReviews || 0})</span>
             </div>
@@ -78,7 +78,7 @@ export default function ProviderCard({ provider }) {
 
         <Link
           to={`/provider-profile/${provider._id}`}
-          className="mt-3 flex items-center justify-center gap-1.5 w-full py-2 text-sm font-semibold text-brand-coral border border-brand-coral/30 rounded-lg hover:bg-brand-coral hover:text-white transition-all duration-150"
+          className="mt-3 flex items-center justify-center gap-1.5 w-full py-2 text-sm font-semibold text-brand-aqua-deep border border-brand-aqua/60 rounded-lg hover:bg-brand-aqua hover:text-brand-navy transition-all duration-150"
         >
           View Profile <ChevronRight className="w-3.5 h-3.5" />
         </Link>

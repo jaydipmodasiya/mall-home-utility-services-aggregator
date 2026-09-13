@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const { createReview, getProviderReviews, getMyReviews } = require('../controllers/reviewController');
 
-router.post('/', protect, createReview);
+router.post('/', protect, authorize('customer'), createReview);
 router.get('/me', protect, getMyReviews);
 router.get('/provider/:providerId', getProviderReviews);
 

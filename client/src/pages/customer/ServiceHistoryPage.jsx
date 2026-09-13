@@ -41,7 +41,7 @@ export default function ServiceHistoryPage() {
                   {b.isReviewed ? (
                     <span className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-0.5"><Star className="w-3 h-3 fill-emerald-500 text-emerald-500" /> Reviewed</span>
                   ) : (
-                    <span className="text-xs text-brand-coral-dark font-medium">Tap to leave a review</span>
+                    <span className="text-xs text-brand-aqua-deep font-medium">Tap to leave a review</span>
                   )}
                 </div>
                 <ChevronRight className="w-4 h-4 text-text-light" />

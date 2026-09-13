@@ -1,9 +1,9 @@
 export const CATEGORIES = [
-  { key: 'electrician', label: 'Electrician', icon: 'Zap',      color: 'bg-amber-50 text-amber-600',    bgAccent: 'bg-amber-100',   description: 'Wiring, fans, sockets, MCB & all electrical work' },
-  { key: 'plumber',     label: 'Plumber',     icon: 'Droplets', color: 'bg-sky-50 text-sky-600',        bgAccent: 'bg-sky-100',     description: 'Pipe leaks, taps, drainage & water heater' },
-  { key: 'carpenter',   label: 'Carpenter',   icon: 'Hammer',   color: 'bg-orange-50 text-orange-600',  bgAccent: 'bg-orange-100',  description: 'Furniture, doors, windows & custom woodwork' },
-  { key: 'tailor',      label: 'Tailor',      icon: 'Scissors', color: 'bg-pink-50 text-pink-600',      bgAccent: 'bg-pink-100',    description: 'Stitching, alterations, uniforms & curtains' },
-  { key: 'maintenance', label: 'Maintenance', icon: 'Wrench',   color: 'bg-teal-50 text-teal-600',      bgAccent: 'bg-teal-100',    description: 'General maintenance, cleaning & handyman tasks' },
+  { key: 'electrician', label: 'Electrician', icon: 'Zap',      color: 'bg-brand-cream-y text-text-primary', bgAccent: 'bg-brand-cream-y', description: 'Wiring, fans, sockets, MCB & all electrical work' },
+  { key: 'plumber',     label: 'Plumber',     icon: 'Droplets', color: 'bg-brand-aqua/20 text-brand-aqua-deep', bgAccent: 'bg-brand-aqua/20', description: 'Pipe leaks, taps, drainage & water heater' },
+  { key: 'carpenter',   label: 'Carpenter',   icon: 'Hammer',   color: 'bg-brand-peach text-text-primary', bgAccent: 'bg-brand-peach', description: 'Furniture, doors, windows & custom woodwork' },
+  { key: 'tailor',      label: 'Tailor',      icon: 'Scissors', color: 'bg-brand-pale text-text-primary', bgAccent: 'bg-brand-pale', description: 'Stitching, alterations, uniforms & curtains' },
+  { key: 'maintenance', label: 'Maintenance', icon: 'Wrench',   color: 'bg-brand-mint text-text-primary', bgAccent: 'bg-brand-mint', description: 'General maintenance, cleaning & handyman tasks' },
 ]
 
 export const STATUS_CONFIG = {
@@ -40,4 +40,4 @@ export const getInitials = (name = '') =>
   name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
 
 export const getCategoryInfo = (key) =>
-  CATEGORIES.find((c) => c.key === key) || { label: key, icon: 'Tool', color: 'bg-gray-50 text-gray-600' }
+  CATEGORIES.find((c) => c.key === key) || { label: key, icon: 'Tool', color: 'bg-surface-tertiary text-text-secondary' }

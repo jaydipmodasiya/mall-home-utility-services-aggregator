@@ -55,7 +55,7 @@ export default function ProviderJobsPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <p className="font-bold text-text-primary capitalize text-sm">{j.serviceCategory}</p>
                   <StatusBadge status={j.status} />
-                  {j.bookingType === 'instant' && <span className="badge bg-orange-50 text-orange-600 text-xs">Instant</span>}
+                  {j.bookingType === 'instant' && <span className="badge bg-brand-peach text-text-primary text-xs">Instant</span>}
                 </div>
                 <p className="text-xs text-text-muted truncate">{j.serviceDescription}</p>
                 <p className="text-xs text-text-muted mt-0.5">{j.customerId?.name} · {j.serviceLocation?.city} · {formatDate(j.createdAt)}</p>

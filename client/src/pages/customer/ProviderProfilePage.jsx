@@ -61,7 +61,7 @@ export default function ProviderProfilePage() {
                       <div className="flex items-center gap-2 mb-1">
                         <h1 className="text-2xl font-bold text-text-primary">{provUser.name}</h1>
                         {provider.isVerified && (
-                          <span className="flex items-center gap-1 text-xs bg-brand-coral-pale text-brand-coral-dark px-2 py-0.5 rounded-full font-semibold">
+                          <span className="flex items-center gap-1 text-xs bg-brand-cream-y text-text-primary px-2 py-0.5 rounded-full font-semibold">
                             <Shield className="w-3 h-3" /> Verified
                           </span>
                         )}
@@ -141,7 +141,7 @@ export default function ProviderProfilePage() {
                         </div>
                         <div className="ml-auto flex items-center gap-0.5">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'}`} />
+                            <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? 'text-brand-aqua-deep fill-brand-cream-y' : 'text-gray-200 fill-gray-200'}`} />
                           ))}
                         </div>
                       </div>

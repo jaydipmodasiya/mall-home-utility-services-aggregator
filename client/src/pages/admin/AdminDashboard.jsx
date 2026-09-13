@@ -26,12 +26,12 @@ export default function AdminDashboard() {
   if (error) return <DashboardLayout role="admin"><ErrorState message="Couldn't load the admin dashboard. Please try again." onRetry={fetchAnalytics} /></DashboardLayout>
 
   const kpiCards = [
-    { label: 'Customers',         value: kpis?.totalUsers ?? 0,          icon: Users,        bg: 'bg-sky-50',     ic: 'text-sky-600',    sub: `+${kpis?.recentUsers ?? 0} this month` },
-    { label: 'Total Providers',    value: kpis?.totalProviders ?? 0,       icon: Shield,       bg: 'bg-violet-50',  ic: 'text-violet-600', sub: `${kpis?.verifiedProviders ?? 0} verified` },
-    { label: 'Total Bookings',     value: kpis?.totalBookings ?? 0,        icon: Calendar,     bg: 'bg-amber-50',   ic: 'text-amber-600',  sub: `${kpis?.pendingBookings ?? 0} active` },
+    { label: 'Customers',         value: kpis?.totalUsers ?? 0,          icon: Users,        bg: 'bg-brand-aqua/20', ic: 'text-brand-aqua-deep', sub: `+${kpis?.recentUsers ?? 0} this month` },
+    { label: 'Total Providers',    value: kpis?.totalProviders ?? 0,       icon: Shield,       bg: 'bg-brand-mint',  ic: 'text-text-primary', sub: `${kpis?.verifiedProviders ?? 0} verified` },
+    { label: 'Total Bookings',     value: kpis?.totalBookings ?? 0,        icon: Calendar,     bg: 'bg-brand-cream-y',   ic: 'text-text-primary',  sub: `${kpis?.pendingBookings ?? 0} active` },
     { label: 'Completion Rate',    value: `${kpis?.completionRate ?? 0}%`, icon: TrendingUp,   bg: 'bg-brand-mint', ic: 'text-emerald-700',sub: `${kpis?.completedBookings ?? 0} completed` },
     { label: 'Open Disputes',      value: kpis?.openDisputes ?? 0,         icon: AlertTriangle, bg: 'bg-red-50',    ic: 'text-red-500',    sub: 'Need attention', urgent: (kpis?.openDisputes > 0) },
-    { label: 'Avg. Rating',        value: kpis?.avgRating ?? 0,            icon: Star,         bg: 'bg-amber-50',   ic: 'text-amber-500',  sub: 'Across all providers' },
+    { label: 'Avg. Rating',        value: kpis?.avgRating ?? 0,            icon: Star,         bg: 'bg-brand-cream-y',   ic: 'text-brand-aqua-deep',  sub: 'Across all providers' },
   ]
 
   const pendingVerification = (kpis?.totalProviders || 0) - (kpis?.verifiedProviders || 0)
@@ -65,8 +65,8 @@ export default function AdminDashboard() {
         <div className="divide-y divide-brand-peach-warm/40">
           {pendingVerification > 0 && (
             <Link to="/admin/providers" className="flex items-center gap-4 px-5 py-4 hover:bg-surface-secondary transition-colors">
-              <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center flex-shrink-0">
-                <Shield className="w-4 h-4 text-violet-600" />
+              <div className="w-9 h-9 rounded-lg bg-brand-mint flex items-center justify-center flex-shrink-0">
+                <Shield className="w-4 h-4 text-text-primary" />
               </div>
               <div className="flex-1">
                 <p className="font-medium text-text-primary text-sm">{pendingVerification} providers awaiting verification</p>

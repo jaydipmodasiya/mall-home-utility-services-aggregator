@@ -1,6 +1,6 @@
 # 🔧 Mall & Home Utility Services Aggregator
 
-> A production-ready full-stack platform connecting customers with verified local service professionals — electricians, plumbers, carpenters, tailors, and maintenance staff.
+> A full-stack platform connecting customers with verified local service professionals — electricians, plumbers, carpenters, tailors, and maintenance staff.
 
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen) ![React](https://img.shields.io/badge/react-18-blue) ![MongoDB](https://img.shields.io/badge/database-MongoDB-green) ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -29,7 +29,7 @@
 
 ### Admin
 - Secure admin dashboard with KPIs
-- Manage all users (activate/deactivate/delete)
+- Manage all users (activate/deactivate while preserving history)
 - Review, approve or reject provider verification
 - Monitor all bookings with filters
 - Manage disputes with manual resolution
@@ -130,11 +130,6 @@ Create a frontend environment file for production deployments:
 VITE_API_URL=http://localhost:5000/api
 ```
 
-For the deployed Render backend, set:
-```bash
-VITE_API_URL=https://mall-home-utility-api.onrender.com/api
-```
-
 > ⚠️ **Security**: Never commit `.env` files. Keep secrets out of source control and set them in your hosting platform.
 
 ### 3. Seed the Database
@@ -144,11 +139,11 @@ cd server
 npm run seed
 ```
 
-This creates:
+This resets categories, users, providers, bookings, reviews, notifications, and provider-discovery records, then creates:
 - **Admin**: `admin@mallutility.in` / `Admin@1234`
 - **Customer**: `priya@example.com` / `Test@1234`
 - **Provider**: `ravi@example.com` / `Test@1234`
-- 5 verified providers, sample bookings & reviews
+- 5 provider profiles, sample bookings & reviews, and valid provider coordinates
 
 ### 4. Run the Application
 
@@ -231,7 +226,6 @@ npm run dev
 | GET | `/api/admin/analytics` | Admin | KPIs & charts |
 | GET | `/api/admin/users` | Admin | All users |
 | PATCH | `/api/admin/users/:id` | Admin | Update user (no admin escalation) |
-| DELETE | `/api/admin/users/:id` | Admin | Delete user |
 | GET | `/api/admin/providers` | Admin | All providers |
 | PATCH | `/api/admin/providers/:id/verify` | Admin | Approve/reject provider |
 | GET | `/api/admin/bookings` | Admin | All bookings |
