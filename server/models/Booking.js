@@ -8,6 +8,12 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    sessionId: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      index: true,
+    },
     providerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ServiceProvider',

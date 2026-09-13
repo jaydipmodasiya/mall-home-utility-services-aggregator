@@ -22,6 +22,8 @@ exports.getAnalytics = async (req, res, next) => {
       pendingBookings,
       openDisputes,
       discoveryEvents,
+      discoverySessions,
+      bookingSessions,
       ratingSummary,
       completionSummary,
     ] = await Promise.all([
@@ -34,6 +36,8 @@ exports.getAnalytics = async (req, res, next) => {
       Booking.countDocuments({ status: { $in: ['pending', 'assigned', 'in_progress'] } }),
       Dispute.countDocuments({ status: 'open' }),
       ProviderDiscovery.countDocuments(),
+      ProviderDiscovery.distinct('sessionId'),
+      Booking.distinct('sessionId', { sessionId: { $exists: true, $nin: [null, ''] } }),
       Review.aggregate([{ $group: { _id: null, average: { $avg: '$rating' } } }]),
       Booking.aggregate([
         { $match: { status: 'completed', completedAt: { $exists: true } } },
@@ -44,6 +48,8 @@ exports.getAnalytics = async (req, res, next) => {
 
     const avgRating = Number((ratingSummary[0]?.average || 0).toFixed(1));
     const avgCompletionHours = Number((completionSummary[0]?.average || 0).toFixed(1));
+    const discoverySessionSet = new Set(discoverySessions);
+    const convertedSessions = bookingSessions.filter((sessionId) => discoverySessionSet.has(sessionId)).length;
 
     // Bookings by category
     const bookingsByCategory = await Booking.aggregate([
@@ -81,7 +87,7 @@ exports.getAnalytics = async (req, res, next) => {
         recentUsers,
         completionRate: totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 0,
         providerDiscoveryEvents: discoveryEvents,
-        bookingConversionRate: discoveryEvents > 0 ? Number(((totalBookings / discoveryEvents) * 100).toFixed(1)) : 0,
+        bookingConversionRate: discoverySessions.length > 0 ? Number(((convertedSessions / discoverySessions.length) * 100).toFixed(1)) : 0,
       },
       charts: { bookingsByCategory, bookingsByMonth },
     });

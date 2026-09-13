@@ -12,14 +12,15 @@ import { CATEGORIES } from '../../utils/constants'
 export default function ProviderSearchPage() {
   const [searchParams] = useSearchParams()
   const [providers, setProviders] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [providerLoading, setProviderLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [pages, setPages] = useState(1)
-  const [error, setError] = useState(false)
+  const [providerLoadError, setProviderLoadError] = useState(false)
   const [coordinates, setCoordinates] = useState(null)
-  const [locating, setLocating] = useState(false)
-  const [locationMessage, setLocationMessage] = useState('')
+  const [locationLoading, setLocationLoading] = useState(false)
+  const [locationError, setLocationError] = useState('')
+  const [locationStatus, setLocationStatus] = useState('')
 
   const [filters, setFilters] = useState({
     category: searchParams.get('category') || '',
@@ -29,8 +30,8 @@ export default function ProviderSearchPage() {
   })
 
   const fetchProviders = async (p = 1, f = filters, location = coordinates) => {
-    setLoading(true)
-    setError(false)
+    setProviderLoading(true)
+    setProviderLoadError(false)
     try {
       const params = new URLSearchParams({ page: p, limit: 12 })
       if (f.category)  params.set('category', f.category)
@@ -46,8 +47,8 @@ export default function ProviderSearchPage() {
       setTotal(data.total || 0)
       setPages(data.pages || 1)
       setPage(p)
-    } catch { setProviders([]); setError(true) }
-    finally { setLoading(false) }
+    } catch { setProviders([]); setProviderLoadError(true) }
+    finally { setProviderLoading(false) }
   }
 
   useEffect(() => {
@@ -58,13 +59,17 @@ export default function ProviderSearchPage() {
       sessionId,
       category: filters.category,
       city: filters.city,
-    }).catch(() => {})
+    }).catch((error) => {
+      if (import.meta.env.DEV) console.warn('Optional provider discovery tracking failed', error)
+    })
     fetchProviders()
   }, [])
 
   const applyFilters = (newFilters) => {
     setFilters(newFilters)
-    fetchProviders(1, newFilters)
+    const cityChanged = newFilters.city !== filters.city
+    if (cityChanged) setCoordinates(null)
+    fetchProviders(1, newFilters, cityChanged ? null : coordinates)
   }
 
   const clearFilter = (key) => {
@@ -73,28 +78,38 @@ export default function ProviderSearchPage() {
   }
 
   const useCurrentLocation = () => {
-    setLocationMessage('')
+    setLocationError('')
+    setLocationStatus('')
+    setCoordinates(null)
     if (!navigator.geolocation) {
-      setLocationMessage('Location is not available in this browser. You can still search by city or area.')
+      setLocationError('Location is not available in this browser. You can still search by city or area.')
       return
     }
-    setLocating(true)
+    setLocationLoading(true)
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        const location = { latitude: coords.latitude, longitude: coords.longitude }
+        const { latitude, longitude } = coords
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+          setLocationLoading(false)
+          setLocationError('Your browser returned an invalid location. You can still search by city or area.')
+          return
+        }
+        const location = { latitude, longitude }
         setCoordinates(location)
-        setLocating(false)
-        setLocationMessage('Searching for providers near you...')
+        setLocationLoading(false)
+        setLocationStatus('Searching for providers near you...')
         fetchProviders(1, filters, location)
       },
       (geoError) => {
-        setLocating(false)
+        setLocationLoading(false)
         const message = geoError.code === geoError.PERMISSION_DENIED
           ? 'Location permission was denied. You can still search by city or area.'
           : geoError.code === geoError.TIMEOUT
             ? 'Location detection timed out. Please try again or search by city or area.'
-            : 'Your location could not be detected. You can still search by city or area.'
-        setLocationMessage(message)
+            : geoError.code === geoError.POSITION_UNAVAILABLE
+              ? 'Your location is currently unavailable. You can still search by city or area.'
+              : 'Your location could not be detected. You can still search by city or area.'
+        setLocationError(message)
       },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
     )
@@ -127,11 +142,12 @@ export default function ProviderSearchPage() {
                   value={filters.city}
                   onChange={(e) => applyFilters({ ...filters, city: e.target.value })}
                 />
-                <button type="button" onClick={useCurrentLocation} disabled={locating} className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-brand-aqua-deep hover:bg-brand-aqua/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua/40 disabled:opacity-50" aria-label={locating ? 'Detecting your location' : 'Use my current location'} title="Use my current location">
-                  {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
+                <button type="button" onClick={useCurrentLocation} disabled={locationLoading} className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-brand-aqua-deep hover:bg-brand-aqua/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-aqua/40 disabled:opacity-50" aria-label={locationLoading ? 'Detecting your location' : 'Use my current location'} title="Use my current location">
+                  {locationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
                 </button>
               </div>
-              {locationMessage && <p className="mt-1 text-xs text-text-muted" role="status">{locationMessage}</p>}
+              {locationError && <p className="mt-1 text-xs text-red-600" role="alert">{locationError}</p>}
+              {locationStatus && <p className="mt-1 text-xs text-text-muted" role="status">{locationStatus}</p>}
             </div>
 
             <DropdownSelect className="min-w-[170px]" value={filters.category} onChange={(value) => applyFilters({ ...filters, category: value })} options={[{ value: '', label: 'All Services' }, ...CATEGORIES.map(({ key, label }) => ({ value: key, label }))]} label="Service category" />
@@ -161,9 +177,9 @@ export default function ProviderSearchPage() {
         </div>
 
         {/* Results */}
-        {loading ? (
+        {providerLoading ? (
           <ProviderListSkeleton />
-        ) : error ? (
+        ) : providerLoadError ? (
           <ErrorState message="We couldn't load providers right now. Please try again." onRetry={() => fetchProviders(1)} />
         ) : providers.length === 0 ? (
           <NoResults query={filters.city} action={<button type="button" className="btn-secondary text-sm" onClick={() => applyFilters({ category: '', city: '', available: '', minRating: '' })}>Clear Filters</button>} />

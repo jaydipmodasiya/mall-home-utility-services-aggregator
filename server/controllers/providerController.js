@@ -18,6 +18,41 @@ const normalizeDocumentType = (value) => {
 
 const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+const normalizeLocation = (location) => {
+  if (!location || typeof location !== 'object' || Array.isArray(location)) {
+    return {};
+  }
+
+  const normalized = { ...location };
+  const coordinates = location.coordinates;
+  if (coordinates === undefined || coordinates === null) {
+    delete normalized.coordinates;
+    return normalized;
+  }
+
+  const values = coordinates.coordinates;
+  const valid = coordinates.type === 'Point'
+    && Array.isArray(values)
+    && values.length === 2
+    && Number.isFinite(Number(values[0]))
+    && Number.isFinite(Number(values[1]))
+    && Number(values[0]) >= -180
+    && Number(values[0]) <= 180
+    && Number(values[1]) >= -90
+    && Number(values[1]) <= 90;
+  if (!valid) {
+    const error = new Error('Location coordinates must be a valid GeoJSON Point [longitude, latitude]');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  normalized.coordinates = {
+    type: 'Point',
+    coordinates: [Number(values[0]), Number(values[1])],
+  };
+  return normalized;
+};
+
 // @desc   Search / list providers
 // @route  GET /api/providers
 // @access Public
@@ -32,7 +67,7 @@ exports.getProviders = async (req, res, next) => {
     if (rating !== null && (!Number.isFinite(rating) || rating < 0 || rating > 5)) {
       return res.status(400).json({ success: false, message: 'Invalid minimum rating' });
     }
-    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const pageNum = Math.min(10000, Math.max(1, parseInt(page, 10) || 1));
     const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 12));
     const lat = Number(latitude);
     const lng = Number(longitude);
@@ -42,7 +77,10 @@ exports.getProviders = async (req, res, next) => {
     const activeUsers = await User.find({ role: 'provider', isActive: true }).select('_id');
     const filter = { verificationStatus: 'approved', isVerified: true, userId: { $in: activeUsers.map((user) => user._id) } };
     if (category) filter.serviceCategories = category;
-    if (city) filter['location.city'] = { $regex: escapeRegex(city.slice(0, 100)), $options: 'i' };
+    if (city) {
+      const locationSearch = { $regex: escapeRegex(city.slice(0, 100)), $options: 'i' };
+      filter.$or = [{ 'location.city': locationSearch }, { 'location.area': locationSearch }];
+    }
     if (area) filter['location.area'] = { $regex: escapeRegex(area.slice(0, 100)), $options: 'i' };
     if (available === 'true') filter.isAvailable = true;
     if (rating !== null) filter.rating = { $gte: rating };
@@ -52,12 +90,21 @@ exports.getProviders = async (req, res, next) => {
       };
     }
 
-    const total = await ServiceProvider.countDocuments(filter);
-    const providers = await ServiceProvider.find(filter)
+    const countFilter = { ...filter };
+    if (hasCoordinates) {
+      countFilter['location.coordinates'] = {
+        $geoWithin: {
+          $centerSphere: [[lng, lat], radiusMeters / 6371000],
+        },
+      };
+    }
+    const total = await ServiceProvider.countDocuments(countFilter);
+    const providerQuery = ServiceProvider.find(filter)
       .populate('userId', 'name avatar')
-      .sort(hasCoordinates ? {} : { rating: -1, completedJobs: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
+    if (!hasCoordinates) providerQuery.sort({ rating: -1, completedJobs: -1 });
+    const providers = await providerQuery;
 
     res.json({
       success: true,
@@ -129,9 +176,10 @@ exports.updateMyProfile = async (req, res, next) => {
   try {
     const { bio, serviceCategories, skills, experience, pricing, location } = req.body;
 
+    const normalizedLocation = normalizeLocation(location);
     const provider = await ServiceProvider.findOneAndUpdate(
       { userId: req.user._id },
-      { bio, serviceCategories, skills, experience, pricing, location },
+      { bio, serviceCategories, skills, experience, pricing, location: normalizedLocation },
       { new: true, runValidators: true }
     ).populate('userId', 'name email phone avatar');
 
@@ -153,11 +201,19 @@ exports.updateAvailability = async (req, res, next) => {
     const { isAvailable, availabilitySlots } = req.body;
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-    const safeSlots = Array.isArray(availabilitySlots) ? availabilitySlots : [];
+    if (typeof isAvailable !== 'boolean') {
+      return res.status(400).json({ success: false, message: 'Availability status must be a boolean' });
+    }
+    if (!Array.isArray(availabilitySlots)) {
+      return res.status(400).json({ success: false, message: 'Availability slots must be an array' });
+    }
+    const safeSlots = availabilitySlots;
     const normalizedSlots = [];
 
     for (const slot of safeSlots) {
-      if (!slot || typeof slot !== 'object') continue;
+      if (!slot || typeof slot !== 'object' || Array.isArray(slot)) {
+        return res.status(400).json({ success: false, message: 'Each availability slot must be an object' });
+      }
 
       if (!days.includes(slot.day)) {
         return res.status(400).json({ success: false, message: 'Invalid availability day' });
@@ -203,7 +259,7 @@ exports.updateAvailability = async (req, res, next) => {
     const provider = await ServiceProvider.findOneAndUpdate(
       { userId: req.user._id },
       { isAvailable, availabilitySlots: normalizedSlots },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     res.json({ success: true, provider });

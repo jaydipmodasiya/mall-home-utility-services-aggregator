@@ -2,7 +2,12 @@ const Notification = require('../models/Notification');
 
 const createNotification = async ({ userId, type, title, message, metadata = {} }) => {
   if (!userId) return null;
-  return Notification.create({ userId, type, title, message, metadata });
+  try {
+    return await Notification.create({ userId, type, title, message, metadata });
+  } catch (error) {
+    console.warn('Optional notification delivery failed:', error.message);
+    return null;
+  }
 };
 
 module.exports = { createNotification };

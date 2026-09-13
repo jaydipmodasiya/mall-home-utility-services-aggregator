@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, LayoutDashboard, LogOut, Menu, Search, User, X, Zap } from 'lucide-react'
+import { Bell, CheckCheck, ChevronDown, LayoutDashboard, LogOut, Menu, Search, User, X, Zap } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -18,6 +18,9 @@ export default function Navbar({ variant = 'dark' }) {
   const notificationRef = useRef(null)
 
   const isLight = variant === 'light'
+  const reportNotificationFailure = (error) => {
+    if (import.meta.env.DEV) console.warn('Optional notification request failed', error)
+  }
 
   useEffect(() => {
     const handler = (e) => {
@@ -33,7 +36,11 @@ export default function Navbar({ variant = 'dark' }) {
     api.get('/notifications?limit=5').then(({ data }) => {
       setNotifications(data.notifications || [])
       setUnread(data.unread || 0)
-    }).catch(() => {})
+    }).catch((error) => {
+      setNotifications([])
+      setUnread(0)
+      reportNotificationFailure(error)
+    })
     return undefined
   }, [user])
 
@@ -43,7 +50,21 @@ export default function Navbar({ variant = 'dark' }) {
       await api.patch(`/notifications/${notification._id}/read`)
       setNotifications((items) => items.map((item) => item._id === notification._id ? { ...item, readAt: new Date().toISOString() } : item))
       setUnread((count) => Math.max(0, count - 1))
-    } catch {}
+    } catch (error) {
+      reportNotificationFailure(error)
+    }
+  }
+
+  const markAllNotificationsRead = async () => {
+    if (!unread) return
+    try {
+      await api.patch('/notifications/read-all')
+      const readAt = new Date().toISOString()
+      setNotifications((items) => items.map((item) => ({ ...item, readAt: item.readAt || readAt })))
+      setUnread(0)
+    } catch (error) {
+      reportNotificationFailure(error)
+    }
   }
 
   const handleLogout = () => { logout(); navigate('/') }
@@ -120,7 +141,7 @@ export default function Navbar({ variant = 'dark' }) {
                     {unread > 0 && <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-brand-coral px-1 text-center text-[10px] font-bold text-white">{unread > 9 ? '9+' : unread}</span>}
                   </button>
                   {notificationOpen && <div className="absolute right-0 top-11 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-brand-peach-warm/60 bg-white p-3 shadow-modal">
-                    <div className="flex items-center justify-between border-b border-brand-peach-warm/40 px-2 pb-2"><p className="text-sm font-bold text-text-primary">Notifications</p><span className="text-xs text-text-muted">{unread} unread</span></div>
+                    <div className="flex items-center justify-between border-b border-brand-peach-warm/40 px-2 pb-2"><p className="text-sm font-bold text-text-primary">Notifications</p><button type="button" onClick={markAllNotificationsRead} disabled={!unread} className="flex items-center gap-1 text-xs font-semibold text-brand-aqua-deep disabled:cursor-not-allowed disabled:opacity-40"><CheckCheck className="h-3.5 w-3.5" /> Mark all as read</button></div>
                     <div className="max-h-72 overflow-y-auto py-1">{notifications.length ? notifications.map((notification) => <button type="button" key={notification._id} onClick={() => markNotificationRead(notification)} className={`w-full rounded-lg px-2 py-2 text-left hover:bg-surface-secondary ${notification.readAt ? '' : 'bg-brand-aqua/10'}`}><p className="text-xs font-semibold text-text-primary">{notification.title}</p><p className="mt-0.5 text-xs text-text-muted">{notification.message}</p></button>) : <p className="px-2 py-6 text-center text-xs text-text-muted">You're all caught up.</p>}</div>
                   </div>}
                 </div>

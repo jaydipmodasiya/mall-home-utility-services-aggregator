@@ -5,12 +5,43 @@ const ServiceProvider = require('../models/ServiceProvider');
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
 
+const normalizeProviderLocation = (location) => {
+  if (location === undefined || location === null) return undefined;
+  if (typeof location !== 'object' || Array.isArray(location)) {
+    return { error: 'Provider location must be an object' };
+  }
+
+  const normalized = { ...location };
+  if (location.coordinates === undefined || location.coordinates === null) {
+    delete normalized.coordinates;
+    return { location: normalized };
+  }
+
+  const values = location.coordinates.coordinates;
+  const valid = location.coordinates.type === 'Point'
+    && Array.isArray(values)
+    && values.length === 2
+    && Number.isFinite(Number(values[0]))
+    && Number.isFinite(Number(values[1]))
+    && Number(values[0]) >= -180
+    && Number(values[0]) <= 180
+    && Number(values[1]) >= -90
+    && Number(values[1]) <= 90;
+  if (!valid) return { error: 'Location coordinates must be a valid GeoJSON Point [longitude, latitude]' };
+
+  normalized.coordinates = {
+    type: 'Point',
+    coordinates: [Number(values[0]), Number(values[1])],
+  };
+  return { location: normalized };
+};
+
 // @desc   Register user
 // @route  POST /api/auth/register
 // @access Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, location } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -24,6 +55,10 @@ exports.register = async (req, res, next) => {
     const requestedRole = req.body.role;
     const ALLOWED_ROLES = ['customer', 'provider'];
     const role = ALLOWED_ROLES.includes(requestedRole) ? requestedRole : 'customer';
+    const providerLocation = role === 'provider' ? normalizeProviderLocation(location) : undefined;
+    if (providerLocation?.error) {
+      return res.status(400).json({ success: false, message: providerLocation.error });
+    }
 
     const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
     if (existingUser) {
@@ -40,7 +75,7 @@ exports.register = async (req, res, next) => {
 
     // Create provider profile if role is provider
     if (user.role === 'provider') {
-      await ServiceProvider.create({ userId: user._id });
+      await ServiceProvider.create({ userId: user._id, ...(providerLocation?.location ? { location: providerLocation.location } : {}) });
     }
 
     const token = generateToken(user._id);

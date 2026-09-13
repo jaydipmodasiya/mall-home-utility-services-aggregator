@@ -7,6 +7,8 @@ const ServiceProvider = require("../models/ServiceProvider");
 const Category = require("../models/Category");
 const Booking = require("../models/Booking");
 const Review = require("../models/Review");
+const Notification = require("../models/Notification");
+const ProviderDiscovery = require("../models/ProviderDiscovery");
 
 const seed = async () => {
   await connectDB();
@@ -20,6 +22,8 @@ const seed = async () => {
     Category.deleteMany(),
     Booking.deleteMany(),
     Review.deleteMany(),
+    Notification.deleteMany(),
+    ProviderDiscovery.deleteMany(),
   ]);
 
   // ---- Categories ----
@@ -169,12 +173,11 @@ const seed = async () => {
         area: "Andheri",
         state: "Maharashtra",
         pincode: "400053",
+        coordinates: { type: "Point", coordinates: [72.8777, 19.1197] },
       },
       isVerified: true,
       verificationStatus: "approved",
       isAvailable: true,
-      rating: 2,
-      totalReviews: 42,
       completedJobs: 58,
       totalEarnings: 74500,
       availabilitySlots: [
@@ -204,12 +207,13 @@ const seed = async () => {
         area: "Koramangala",
         state: "Karnataka",
         pincode: "560034",
+        coordinates: { type: "Point", coordinates: [77.6245, 12.9352] },
       },
       isVerified: true,
       verificationStatus: "approved",
       isAvailable: true,
-      rating: 4,
-      totalReviews: 31,
+      rating: 0,
+      totalReviews: 0,
       completedJobs: 44,
       totalEarnings: 52000,
       availabilitySlots: [
@@ -238,12 +242,13 @@ const seed = async () => {
         area: "Bandra",
         state: "Maharashtra",
         pincode: "400050",
+        coordinates: { type: "Point", coordinates: [72.8296, 19.0607] },
       },
       isVerified: true,
       verificationStatus: "approved",
       isAvailable: true,
-      rating: 5,
-      totalReviews: 67,
+      rating: 0,
+      totalReviews: 0,
       completedJobs: 89,
       totalEarnings: 118000,
       availabilitySlots: [
@@ -271,12 +276,13 @@ const seed = async () => {
         area: "Satellite",
         state: "Gujarat",
         pincode: "380015",
+        coordinates: { type: "Point", coordinates: [72.515, 23.0216] },
       },
       isVerified: true,
       verificationStatus: "approved",
       isAvailable: false,
-      rating: 4,
-      totalReviews: 19,
+      rating: 0,
+      totalReviews: 0,
       completedJobs: 27,
       totalEarnings: 18000,
       availabilitySlots: [
@@ -303,6 +309,7 @@ const seed = async () => {
         area: "Whitefield",
         state: "Karnataka",
         pincode: "560066",
+        coordinates: { type: "Point", coordinates: [77.7499, 12.9698] },
       },
       isVerified: false,
       verificationStatus: "under_review",

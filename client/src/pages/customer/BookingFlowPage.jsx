@@ -11,6 +11,11 @@ import { RatingDisplay } from '../../components/ui/StarRating'
 import api from '../../services/api'
 import { CATEGORIES, formatCurrency } from '../../utils/constants'
 
+const toLocalDateTimeValue = (date = new Date()) => {
+  const pad = (value) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
 export default function BookingFlowPage() {
   const { providerId } = useParams()
   const navigate = useNavigate()
@@ -52,6 +57,7 @@ export default function BookingFlowPage() {
     try {
       const { data } = await api.post('/bookings', {
         providerId,
+        sessionId: sessionStorage.getItem('provider-discovery-session') || undefined,
         ...form,
         scheduledAt: form.bookingType === 'scheduled' ? new Date(form.scheduledAt).toISOString() : null,
         estimatedAmount: provider.pricing?.visitingCharge || 0,
@@ -147,7 +153,7 @@ export default function BookingFlowPage() {
             {form.bookingType === 'scheduled' && (
               <div>
                 <label className="form-label">Preferred Date & Time *</label>
-                <input type="datetime-local" className={`form-input ${errors.scheduledAt ? 'form-input-error' : ''}`} min={new Date().toISOString().slice(0, 16)} value={form.scheduledAt} onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })} />
+                <input type="datetime-local" className={`form-input ${errors.scheduledAt ? 'form-input-error' : ''}`} min={toLocalDateTimeValue()} value={form.scheduledAt} onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })} />
                 {errors.scheduledAt && <p className="form-error">{errors.scheduledAt}</p>}
               </div>
             )}

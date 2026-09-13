@@ -36,10 +36,25 @@ const serviceProviderSchema = new mongoose.Schema(
       state: { type: String, default: '' },
       pincode: { type: String, default: '' },
       timezone: { type: String, default: 'Asia/Kolkata' },
-      // Optional geospatial data for future location features. Avoid [0,0] as a meaningful location.
       coordinates: {
-        type: { type: String, enum: ['Point'], default: null },
-        coordinates: { type: [Number], default: null },
+        type: mongoose.Schema.Types.Mixed,
+        default: undefined,
+        validate: {
+          validator: (value) => {
+            if (value === undefined) return true;
+            return value
+              && value.type === 'Point'
+              && Array.isArray(value.coordinates)
+              && value.coordinates.length === 2
+              && Number.isFinite(value.coordinates[0])
+              && Number.isFinite(value.coordinates[1])
+              && value.coordinates[0] >= -180
+              && value.coordinates[0] <= 180
+              && value.coordinates[1] >= -90
+              && value.coordinates[1] <= 90;
+          },
+          message: 'Location coordinates must be a valid GeoJSON Point [longitude, latitude]',
+        },
       },
     },
     isVerified: {

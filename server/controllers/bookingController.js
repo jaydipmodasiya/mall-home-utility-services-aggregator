@@ -46,7 +46,7 @@ exports.createBooking = async (req, res, next) => {
   try {
     const {
       providerId, serviceCategory, serviceDescription,
-      bookingType, scheduledAt, serviceLocation,
+      bookingType, scheduledAt, serviceLocation, sessionId,
     } = req.body;
 
     // ── Validate required fields ──────────────────────
@@ -55,6 +55,9 @@ exports.createBooking = async (req, res, next) => {
     }
     if (!serviceLocation.address || !serviceLocation.city) {
       return res.status(400).json({ success: false, message: 'Service location address and city are required' });
+    }
+    if (sessionId !== undefined && (typeof sessionId !== 'string' || !sessionId.trim() || sessionId.length > 120)) {
+      return res.status(400).json({ success: false, message: 'Invalid discovery session id' });
     }
     const locationType = ['residential', 'apartment', 'commercial', 'mall'].includes(serviceLocation.locationType)
       ? serviceLocation.locationType
@@ -73,6 +76,9 @@ exports.createBooking = async (req, res, next) => {
     if (bType === 'scheduled') {
       if (!scheduledAt) {
         return res.status(400).json({ success: false, message: 'Scheduled time is required for scheduled bookings' });
+      }
+      if (typeof scheduledAt !== 'string' || !/(Z|[+-]\d{2}:\d{2})$/.test(scheduledAt)) {
+        return res.status(400).json({ success: false, message: 'Scheduled time must include a timezone' });
       }
       const schedDate = new Date(scheduledAt);
       if (isNaN(schedDate.getTime())) {
@@ -129,6 +135,7 @@ exports.createBooking = async (req, res, next) => {
 
     const booking = await Booking.create({
       customerId: req.user._id,
+      sessionId: sessionId?.trim(),
       providerId,
       serviceCategory,
       serviceDescription: serviceDescription.trim().slice(0, 1000),
@@ -367,8 +374,12 @@ exports.adminGetBookings = async (req, res, next) => {
     const { status, page = 1, limit = 20, category, city } = req.query;
 
     const VALID_STATUSES = ['pending', 'assigned', 'in_progress', 'completed', 'cancelled', 'rejected'];
+    const VALID_CATEGORIES = ['electrician', 'plumber', 'carpenter', 'tailor', 'maintenance'];
     const filter = {};
     if (status && VALID_STATUSES.includes(status)) filter.status = status;
+    if (category && !VALID_CATEGORIES.includes(category)) {
+      return res.status(400).json({ success: false, message: 'Invalid service category' });
+    }
     if (category) filter.serviceCategory = category;
     if (city) filter['serviceLocation.city'] = { $regex: city, $options: 'i' };
 

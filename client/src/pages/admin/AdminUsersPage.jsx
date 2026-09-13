@@ -62,13 +62,16 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Filters */}
-      <div className="card card-body mb-6 flex flex-col sm:flex-row gap-3">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light" />
-          <input type="text" className="form-input pl-10" placeholder="Search by name or email..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchUsers(search, roleFilter)} />
+      <div className="card card-body mb-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(180px,0.45fr)_auto] sm:items-end">
+        <div className="relative min-w-0">
+          <label className="form-label" htmlFor="admin-user-search">Search users</label>
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light" />
+            <input id="admin-user-search" type="text" className="form-input h-11 pl-10" placeholder="Search by name or email..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchUsers(search, roleFilter)} />
+          </div>
         </div>
-        <DropdownSelect className="min-w-[160px]" value={roleFilter} onChange={(value) => { setRoleFilter(value); fetchUsers(search, value) }} label="Role" options={[{ value: '', label: 'All Roles' }, { value: 'customer', label: 'Customers' }, { value: 'provider', label: 'Providers' }, { value: 'admin', label: 'Admins' }]} />
-        <button onClick={() => fetchUsers(search, roleFilter)} className="btn-secondary">Search</button>
+        <DropdownSelect className="w-full" value={roleFilter} onChange={(value) => { setRoleFilter(value); fetchUsers(search, value) }} label="Role" options={[{ value: '', label: 'All Roles' }, { value: 'customer', label: 'Customers' }, { value: 'provider', label: 'Providers' }, { value: 'admin', label: 'Admins' }]} />
+        <button onClick={() => fetchUsers(search, roleFilter)} className="btn-secondary h-11 w-full sm:w-auto sm:min-w-[112px]">Search</button>
       </div>
 
       {loading ? <SectionLoader /> : error ? <ErrorState message="Couldn't load users. Please try again." onRetry={() => fetchUsers()} /> : users.length === 0 ? (
